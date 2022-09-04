@@ -13,6 +13,11 @@ class Tree():
         dir = Node(filename,self)
         self.child.append(dir)
     
+    def addfile(self,filename):
+        file = Node(filename,self)
+        file.type = "file"
+        self.child.append(file)
+
     def absolutepath(self):
         return "/"
 
@@ -36,6 +41,11 @@ class Node():
         dir = Node(filename,self)
         self.child.append(dir)
     
+    def addfile(self,filename):
+        file = Node(filename,self)
+        file.type = "file"
+        self.child.append(file)
+
 def check_absolute(path,root):
     if root.absolutepath()==path:
         return True,root
@@ -67,10 +77,12 @@ def main():
                     else:
                         print('cd: No such file or directory')
                 else:
+                    if len(root.pwd.child)==0:
+                        print('cd: No such file or directory')
                     for file in root.pwd.child:
                         if file.pwd == command[1]:
                             if file.type != "directory":
-                                print('cd: No such file or directory')
+                                print("cd: Destination is a file")
                             else:
                                 root.pwd = file
                         else:
@@ -83,6 +95,10 @@ def main():
                 dir = command[1]
                 root.pwd.adddirectory(dir)
         
+        elif command[0] == 'touch':
+            file = command[1]
+            root.pwd.addfile(file)
+
         elif command[0] == 'ls':
             for child in root.pwd.child:
                 print(child.pwd)
