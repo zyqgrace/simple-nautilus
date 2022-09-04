@@ -68,7 +68,12 @@ def main():
                 else:
                     for file in root.pwd.child:
                         if file.pwd == command[1]:
-                            root.pwd = file
+                            if file.type != "directory":
+                                print('cd: No such file or directory')
+                            else:
+                                root.pwd = file
+                        else:
+                            print('cd: No such file or directory')
 
         elif command[0] == 'mkdir':
             if command[1] == '-p':
@@ -76,9 +81,11 @@ def main():
             else:
                 dir = command[1]
                 root.pwd.adddirectory(dir)
+        
+        elif command[0] == 'ls':
+            for child in root.pwd.child:
+                print(child.pwd)
 
-
-        i+=1
         command = (input(root.pwd)).split(" ")
     print(f"bye, {root.user}")
 
