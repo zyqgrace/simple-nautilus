@@ -84,8 +84,6 @@ def main():
                 print("cd: Invalid syntax")
             else:
                 path = command[1].split("/")
-                print(path)
-
                 if path[0]=="":
                     if pathexist(path[1:],root)!= False:
                         temp = pathexist(path[1:],root)
@@ -103,7 +101,6 @@ def main():
                         else:
                             root.pwd = temp
                     else:
-                        print("trigger error")
                         print('cd: No such file or directory')
 
         elif command[0] == 'mkdir':
