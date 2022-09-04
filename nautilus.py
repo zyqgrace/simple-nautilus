@@ -46,13 +46,28 @@ class Node():
         file.type = "file"
         self.child.append(file)
 
-def check_absolute(path,root):
-    if root.absolutepath()==path:
-        return True,root
-    if len(root.child) > 0:
-        for child in root.child:
-            if check_absolute(path,child)[0]== True:
-                return check_absolute(path,child)
+def pathexist(path,pwd):
+    if path[0]=="":
+        return pwd
+    temp = pwd
+    i = 0
+    while i < len(path):
+        if path[i]==".":
+            i+=1
+        elif path[i] == "..":
+            temp = temp.parent
+            i+=1
+        else:
+            if len(temp.child)==0:
+                return False
+            for file in temp.child:
+                if path[i] == file.pwd:
+                    temp = file
+                    i +=1
+                    break
+                else:
+                    return False
+    return temp
 
 def main():
     # TODO
@@ -68,25 +83,28 @@ def main():
             if len(command)==1:
                 print("cd: Invalid syntax")
             else:
-                if command[1][0]=="/":
-                    if check_absolute(command[1],root) != None:
-                        temp = check_absolute(command[1],root)[1]
+                path = command[1].split("/")
+                print(path)
+
+                if path[0]=="":
+                    if pathexist(path[1:],root)!= False:
+                        temp = pathexist(path[1:],root)
                         if temp.type != "directory":
                             print("cd: Destination is a file")
-                        root.pwd = check_absolute(command[1],root)[1]
+                        else:
+                            root.pwd = temp 
                     else:
                         print('cd: No such file or directory')
                 else:
-                    if len(root.pwd.child)==0:
-                        print('cd: No such file or directory')
-                    for file in root.pwd.child:
-                        if file.pwd == command[1]:
-                            if file.type != "directory":
-                                print("cd: Destination is a file")
-                            else:
-                                root.pwd = file
+                    if pathexist(path,root.pwd)!= False:
+                        temp = pathexist(path,root.pwd)
+                        if temp.type != "directory":
+                            print("cd: Destination is a file")
                         else:
-                            print('cd: No such file or directory')
+                            root.pwd = temp
+                    else:
+                        print("trigger error")
+                        print('cd: No such file or directory')
 
         elif command[0] == 'mkdir':
             if command[1] == '-p':
