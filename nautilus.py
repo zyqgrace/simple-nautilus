@@ -55,6 +55,8 @@ def pathexist(path,pwd):
         if path[i]==".":
             i+=1
         elif path[i] == "..":
+            if temp.parent ==None:
+                return temp
             temp = temp.parent
             i+=1
         else:
