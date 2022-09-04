@@ -59,8 +59,8 @@ def main():
                 print("cd: Invalid syntax")
             else:
                 if command[1][0]=="/":
-                    temp = check_absolute(command[1],root)[1]
-                    if temp != None:
+                    if check_absolute(command[1],root) != None:
+                        temp = check_absolute(command[1],root)[1]
                         if temp.type != "directory":
                             print("cd: Destination is a file")
                         root.pwd = check_absolute(command[1],root)[1]
