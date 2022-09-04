@@ -38,10 +38,11 @@ class Node():
     
 def check_absolute(path,root):
     if root.absolutepath()==path:
-        return root
+        return True,root
     if len(root.child) > 0:
         for child in root.child:
-            check_absolute(path,child)
+            if check_absolute(path,child)[0]== True:
+                return check_absolute(path,child)
 
 def main():
     # TODO
@@ -58,11 +59,11 @@ def main():
                 print("cd: Invalid syntax")
             else:
                 if command[1][0]=="/":
-                    temp = check_absolute(command[1],root)
+                    temp = check_absolute(command[1],root)[1]
                     if temp != None:
                         if temp.type != "directory":
                             print("cd: Destination is a file")
-                        root.pwd = check_absolute(command[1],root)
+                        root.pwd = check_absolute(command[1],root)[1]
                     else:
                         print('cd: No such file or directory')
                 else:
