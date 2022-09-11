@@ -75,7 +75,8 @@ def main():
     # TODO
     root = Tree()
 
-    command = (input(root.pwd)).split(" ")
+    original = input(root.pwd)
+    command = original.split(" ")
     i = 0
     while command[0] != "exit":
         if command[0] == "pwd":
@@ -119,6 +120,9 @@ def main():
         elif command[0] == 'ls':
             for child in root.pwd.child:
                 print(child.pwd)
+
+        else:
+            print(f'{original}: command not found')
 
         command = (input(root.pwd)).split(" ")
     print(f"bye, {root.user}")
