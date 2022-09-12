@@ -1,74 +1,64 @@
 class Tree():
-    def __init__(self):
+    def __init__(self,name = "/", parent = None):
         self.user = "root"
-        self.parent = None
-        self.pwd = self
-        self.child = []
-        self.type = "directory"
-
-    def __str__(self):
-        return f'{self.user}:/$ '
-
-    def adddirectory(self,filename):
-        dir = Node(filename,self)
-        self.child.append(dir)
-    
-    def addfile(self,filename):
-        file = Node(filename,self)
-        file.type = "file"
-        self.child.append(file)
-
-    def absolutepath(self):
-        return "/"
-
-class Node():
-    def __init__(self,filename,parent):
-        self.user = "root"
-        self.pwd = filename
         self.parent = parent
+        self.pwd = self
+        self.name = name
         self.child = []
         self.type = "directory"
 
     def __str__(self):
         return f'{self.user}:{self.absolutepath()}$ '
 
-    def absolutepath(self):
-        if self.parent.parent != None:
-            return self.parent.absolutepath() + "/" + self.pwd
-        return "/" + self.pwd
-    
     def adddirectory(self,filename):
-        dir = Node(filename,self)
+        dir = Tree(filename,self)
         self.child.append(dir)
     
     def addfile(self,filename):
-        file = Node(filename,self)
+        file = Tree(filename,self)
         file.type = "file"
         self.child.append(file)
 
-def pathexist(path,pwd):
+    def absolutepath(self):
+        if self.parent == None:
+            return "/"
+        if self.parent.parent != None:
+            return self.parent.absolutepath() + "/" + self.name
+        return "/" + self.name
+    
+    def cd(self,path):
+        self.pwd = path
+
+def pathexist(path,root):
+    if path == ["",""]:
+        return root
+    cur = root
     if path[0]=="":
-        return pwd
+        path = path[1:]
+    else:
+        cur = root.pwd
     i = 0
     while i < len(path):
         if path[i]==".":
             i+=1
         elif path[i] == "..":
-            if pwd.parent ==None:
-                return pwd
-            pwd = pwd.parent
+            if cur.parent == None:
+                return cur
+            cur = cur.parent
             i+=1
         else:
-            if len(pwd.child)==0:
+            if len(cur.child)==0:
                 return False
-            for file in pwd.child:
-                if path[i] == file.pwd:
-                    pwd = file
+            found = False
+            for file in cur.child:
+                if path[i] == file.name:
+                    cur = file
                     i +=1
+                    found = True
                     break
-                else:
-                    return False
-    return pwd
+            if not found:
+                return False
+    return cur
 
 def main():
     # TODO
@@ -80,21 +70,17 @@ def main():
     while command[0] != "exit":
         if command[0] == "pwd":
             print(root.pwd.absolutepath())
-            
+
         elif command[0] == 'cd':
             if len(command)==1:
                 print("cd: Invalid syntax")
             else:
-                path = command[1].split("/")
-                if path[0]=="":
-                    temp = pathexist(path[1:],root)
-                else:
-                    temp = pathexist(path,root.pwd)
+                temp = pathexist(command[1].split("/"),root)
                 if temp!=False:
                     if temp.type != "directory":
                         print("cd: Destination is a file")
                     else:
-                        root.pwd = temp 
+                        root.cd(temp)
                 else:
                     print('cd: No such file or directory')
 
@@ -102,16 +88,24 @@ def main():
             if command[1] == '-p':
                 pass
             else:
-                dir = command[1]
-                root.pwd.adddirectory(dir)
+                dir = command[1].split("/")
+                if len(dir)==1:
+                    root.pwd.adddirectory(dir[0])
+                elif pathexist(dir[:-1],root)!=False:
+                    temp = pathexist(dir[:-1],root)
+                    temp.adddirectory(dir[-1])
         
         elif command[0] == 'touch':
-            file = command[1]
-            root.pwd.addfile(file)
+            file = command[1].split("/")
+            if len(file)==1:
+                root.pwd.adddfile(file[0])
+            elif pathexist(file[:-1],root)!=False:
+                temp = pathexist(file[:-1],root)
+                temp.addfile(file[-1])
 
         elif command[0] == 'ls':
             for child in root.pwd.child:
-                print(child.pwd)
+                print(child.name)
 
         else:
             print(f'{original}: command not found')
