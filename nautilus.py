@@ -102,12 +102,12 @@ def main():
             elif pathexist(file[:-1],root)!=False:
                 temp = pathexist(file[:-1],root)
                 temp.addfile(file[-1])
-
+        
         elif command[0] == 'ls':
             for child in root.pwd.child:
                 print(child.name)
         
-        elif command[0] == 'rmdir':
+        elif command[0] == 'rm' or command[0] == 'rmdir':
             path = command[1].split("/")
             if len(path)==1:
                 for child in root.pwd.child:
