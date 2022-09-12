@@ -119,6 +119,22 @@ def main():
                     if child == pathexist(path,root):
                         temp.child.remove(child)
 
+        elif command[0] == 'cp':
+            path = command[1].split("/")
+            if len(path)==1:
+                for child in root.pwd.child:
+                    if child.name == path[0]:
+                        source = child
+            else:
+                source = pathexist(path,root)
+            path2 = command[2].split("/")
+            if len(path2)==1:
+                source.name = path2[0]
+                root.pwd.child.append(source)
+            else:
+                dis = pathexist(path2[:-1],root)
+                source.name = path2[-1]
+                dis.child.append(source)
 
 
         else:
