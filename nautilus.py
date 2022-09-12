@@ -49,27 +49,26 @@ class Node():
 def pathexist(path,pwd):
     if path[0]=="":
         return pwd
-    temp = pwd
     i = 0
     while i < len(path):
         if path[i]==".":
             i+=1
         elif path[i] == "..":
-            if temp.parent ==None:
-                return temp
-            temp = temp.parent
+            if pwd.parent ==None:
+                return pwd
+            pwd = pwd.parent
             i+=1
         else:
-            if len(temp.child)==0:
+            if len(pwd.child)==0:
                 return False
-            for file in temp.child:
+            for file in pwd.child:
                 if path[i] == file.pwd:
-                    temp = file
+                    pwd = file
                     i +=1
                     break
                 else:
                     return False
-    return temp
+    return pwd
 
 def main():
     # TODO
@@ -88,23 +87,16 @@ def main():
             else:
                 path = command[1].split("/")
                 if path[0]=="":
-                    if pathexist(path[1:],root)!= False:
-                        temp = pathexist(path[1:],root)
-                        if temp.type != "directory":
-                            print("cd: Destination is a file")
-                        else:
-                            root.pwd = temp 
-                    else:
-                        print('cd: No such file or directory')
+                    temp = pathexist(path[1:],root)
                 else:
-                    if pathexist(path,root.pwd)!= False:
-                        temp = pathexist(path,root.pwd)
-                        if temp.type != "directory":
-                            print("cd: Destination is a file")
-                        else:
-                            root.pwd = temp
+                    temp = pathexist(path,root.pwd)
+                if temp!=False:
+                    if temp.type != "directory":
+                        print("cd: Destination is a file")
                     else:
-                        print('cd: No such file or directory')
+                        root.pwd = temp 
+                else:
+                    print('cd: No such file or directory')
 
         elif command[0] == 'mkdir':
             if command[1] == '-p':
