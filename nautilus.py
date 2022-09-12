@@ -98,7 +98,7 @@ def main():
         elif command[0] == 'touch':
             file = command[1].split("/")
             if len(file)==1:
-                root.pwd.adddfile(file[0])
+                root.pwd.addfile(file[0])
             elif pathexist(file[:-1],root)!=False:
                 temp = pathexist(file[:-1],root)
                 temp.addfile(file[-1])
@@ -106,11 +106,25 @@ def main():
         elif command[0] == 'ls':
             for child in root.pwd.child:
                 print(child.name)
+        
+        elif command[0] == 'rmdir':
+            path = command[1].split("/")
+            if len(path)==1:
+                for child in root.pwd.child:
+                    if child.name == path[0]:
+                        root.pwd.child.remove(child)
+            else:
+                temp = pathexist(path[:-1],root)
+                for child in temp.child:
+                    if child == pathexist(path,root):
+                        temp.child.remove(child)
+
+
 
         else:
             print(f'{original}: command not found')
-
-        command = (input(root.pwd)).split(" ")
+        original = input(root.pwd)
+        command = original.split(" ")
     print(f"bye, {root.user}")
 
 
