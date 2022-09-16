@@ -118,6 +118,7 @@ def main():
                 for child in temp.child:
                     if child == pathexist(path,root):
                         temp.child.remove(child)
+                        ##test
 
         elif command[0] == 'cp':
             path = command[1].split("/")
