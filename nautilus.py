@@ -156,12 +156,32 @@ def main():
                 print("cp: Source is a directory")
             else:
                 dis = root.pathexist(path2[:-1])
-                if dis == False:
+                if dis == False or dis.type == "file":
                     print("cp: No such file or directory")
                 else:
                     dis.child.append(source)
+        elif command[0] == 'mv':
+            path = command[1].split("/")
+            path2 = command[2].split("/")
 
+            source = root.pathexist(path)
+            dis = root.pathexist(path2)
 
+            if (dis !=False and dis.type == "file"):
+                print("mv: File exists")
+            elif source == False:
+                print("mv: No such file")
+            elif (dis !=False and dis.type == "directory"):
+                print("mv: Destination is a directory")
+            elif source.type == "directory":
+                print("mv: Source is a directory")
+            else:
+                dis = root.pathexist(path2[:-1])
+                if dis == False or dis.type == "file":
+                    print("mv: No such file or directory")
+                else:
+                    source.parent = dis
+                    dis.child.append(source)
 
         else:
             print(f'{original}: command not found')
