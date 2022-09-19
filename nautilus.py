@@ -187,7 +187,7 @@ def main():
                 if dis == False or dis.type == "file":
                     print("cp: No such file or directory")
                 else:
-                    dis.child.append(source)
+                    dis.addfile(path2[-1])
 
         elif command[0] == 'mv':
             path = command[1].split("/")
