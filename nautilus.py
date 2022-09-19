@@ -27,7 +27,14 @@ class Namespace():
         return "/" + self.name
     
     def cd(self,path):
-        self.pwd = path
+        temp = self.pathexist(path)
+        if temp==False:
+            print('cd: No such file or directory')
+        else:
+            if temp.type == "file":
+                print("cd: Destination is a file")
+            else:
+                self.pwd = temp
 
     # if the path exist, return the path, else it would return False
     def pathexist(self,path):
@@ -76,27 +83,22 @@ def main():
             if len(command)==1:
                 print("cd: Invalid syntax")
             else:
-                temp = root.pathexist(command[1].split("/"))
-                if temp!=False:
-                    if temp.type != "directory":
-                        print("cd: Destination is a file")
-                    else:
-                        root.cd(temp)
-                else:
-                    print('cd: No such file or directory')
+                path = command[1].split("/")
+                root.cd(path)
 
         elif command[0] == 'mkdir':
             if command[1] == '-p':
                 dir = command[2].split("/")
-                i = 1
-                while i <= len(dir):
-                    if root.pathexist(dir[:i])!=False:
-                        temp = root.pathexist(dir[:i])
-                    else:
-                        temp = root.pathexist(dir[:i-1])
-                        temp.adddirectory(dir[i-1])
-                        
-                    i+=1
+                if root.pathexist(dir[0])==False:
+                    root.pwd.adddirectory(dir[0])
+                    i = 1
+                    while i <= len(dir):
+                        if root.pathexist(dir[:i])!=False:
+                            temp = root.pathexist(dir[:i])
+                        else:
+                            temp = root.pathexist(dir[:i-1])
+                            temp.adddirectory(dir[i-1])
+                        i+=1
             else:
                 dir = command[1].split("/")
                 if root.pathexist(dir)!=False:
@@ -138,22 +140,26 @@ def main():
 
         elif command[0] == 'cp':
             path = command[1].split("/")
-            if len(path)==1:
-                for child in root.pwd.child:
-                    if child.name == path[0]:
-                        source = child
-            else:
-                source = root.pathexist(path)
             path2 = command[2].split("/")
-            if root.pathexist(path2):
-                print("p: File exists")
-            if len(path2)==1:
-                source.name = path2[0]
-                root.pwd.child.append(source)
+
+            source = root.pathexist(path)
+            dis = root.pathexist(path2)
+
+            if source == False:
+                print("cp: No such file")
+            elif source.type == "directory":
+                print("cp: Source is a directory")
+            elif (dis !=False and dis.type == "file"):
+                print("cp: File exists")
+            elif (dis !=False and dis.type == "directory"):
+                print("cp: Destination is a directory")
             else:
                 dis = root.pathexist(path2[:-1])
-                source.name = path2[-1]
-                dis.child.append(source)
+                if dis == False:
+                    print("cp: No such file or directory")
+                else:
+                    dis.child.append(source)
+
 
 
         else:
