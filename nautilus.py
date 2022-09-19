@@ -86,7 +86,16 @@ def main():
 
         elif command[0] == 'mkdir':
             if command[1] == '-p':
-                pass
+                dir = command[2].split("/")
+                i = 1
+                while i <= len(dir):
+                    if pathexist(dir[:i],root)!=False:
+                        temp = pathexist(dir[:i],root)
+                    else:
+                        temp = pathexist(dir[:i-1],root)
+                        temp.adddirectory(dir[i-1])
+                        
+                    i+=1
             else:
                 dir = command[1].split("/")
                 if pathexist(dir,root)!=False:
