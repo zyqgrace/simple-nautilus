@@ -89,11 +89,15 @@ def main():
                 pass
             else:
                 dir = command[1].split("/")
-                if len(dir)==1:
+                if pathexist(dir,root)!=False:
+                    print("mkdir: File exists")
+                elif len(dir)==1:
                     root.pwd.adddirectory(dir[0])
                 elif pathexist(dir[:-1],root)!=False:
                     temp = pathexist(dir[:-1],root)
                     temp.adddirectory(dir[-1])
+                else:
+                    print("mkdir: Ancestor directory does not exist")
         
         elif command[0] == 'touch':
             file = command[1].split("/")
