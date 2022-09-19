@@ -80,26 +80,61 @@ class Namespace():
                     return False
         return cur
 
+def user_command(pwd):
+    original = input(pwd)
+    if "\"" in original:
+        i = 0
+        quote_ind = 0
+        command = []
+        while i < len(original):
+            if original[i]=="\"":
+                command.append(original[quote_ind:i])
+                quote_ind = i+1
+            i+=1
+        command[0]=command[0].strip(" ")
+    else:
+        i = 0
+        quote_ind = 0
+        command = []
+        while i < len(original):
+            if original[i]==" ":
+                command.append(original[quote_ind:i])
+                quote_ind = i+1
+            elif i == len(original)-1:
+                command.append(original[quote_ind:i+1])
+            i+=1
+    return command
+
 def main():
     # TODO
     root = Namespace()
 
-    original = input(root.pwd)
-    command = original.split(" ")
-    i = 0
-    while command[0] != "exit":
-        if command[0] == "pwd":
-            print(root.pwd.absolutepath())
+    while True:
+        command = user_command(root.pwd)
+        if command == [] or command[0]=="":
+            pass
+        elif command[0]== "exit":
+            if len(command)!=1:
+                print("exit: Invalid syntax")
+            else:
+                break
+        elif command[0] == "pwd":
+            if len(command)>1:
+                print("pwd: Invalid syntax")
+            else:
+                print(root.pwd.absolutepath())
 
         elif command[0] == 'cd':
-            if len(command)==1:
+            if len(command)!=2:
                 print("cd: Invalid syntax")
             else:
                 path = command[1].split("/")
                 root.cd(path)
 
         elif command[0] == 'mkdir':
-            if command[1] == '-p':
+            if len(command)!=2:
+                print("mkdir: Invalid syntax")
+            elif command[1] == '-p':
                 dir = command[2].split("/")
                 if root.pathexist(dir[0])==False:
                     root.pwd.adddirectory(dir[0])
@@ -124,100 +159,113 @@ def main():
                     print("mkdir: Ancestor directory does not exist")
         
         elif command[0] == 'touch':
-            file = command[1].split("/")
-            if len(file)==1:
-                root.pwd.addfile(file[0])
-            elif root.pathexist(file[:-1])!=False:
-                temp = root.pathexist(file[:-1])
-                temp.addfile(file[-1])
+            if len(command)!=2:
+                print("touch: Invalid syntax")
             else:
-                print("touch: Ancestor directory does not exist")
+                file = command[1].split("/")
+                if len(file)==1:
+                    root.pwd.addfile(file[0])
+                elif root.pathexist(file[:-1])!=False:
+                    temp = root.pathexist(file[:-1])
+                    temp.addfile(file[-1])
+                else:
+                    print("touch: Ancestor directory does not exist")
         
         elif command[0] == 'ls':
             for child in root.pwd.child:
                 print(child.name)
         
         elif command[0] == 'rm':
-            path = command[1].split("/")
-            file = root.pathexist(path)
-            if file == False:
-                print("rm: No such file")
-            elif file.type =="directory":
-                print("rm: Is a directory")
+            if len(command)!=2:
+                print("rm: Invalid syntax")
             else:
-                if file.parent == None:
-                    root.rm(file)
+                path = command[1].split("/")
+                file = root.pathexist(path)
+                if file == False:
+                    print("rm: No such file")
+                elif file.type =="directory":
+                    print("rm: Is a directory")
                 else:
-                    file.parent.rm(file)
+                    if file.parent == None:
+                        root.rm(file)
+                    else:
+                        file.parent.rm(file)
 
         elif command[0] == 'rmdir':
-            path = command[1].split("/")
-            dir = root.pathexist(path)
-            if dir == False:
-                print("rmdir: No such file or directory")
-            elif dir == root.pwd:
-                print("rmdir: Cannot remove pwd")
-            elif dir.type =="file":
-                print("rmdir: Not a directory")
-            elif len(dir.child) > 0:
-                print("rmdir: Directory not empty")
+            if len(command) != 2:
+                print("rm: Invalid syntax")
             else:
-                if dir.parent == None:
-                    root.rmdir(dir)
+                path = command[1].split("/")
+                dir = root.pathexist(path)
+                if dir == False:
+                    print("rmdir: No such file or directory")
+                elif dir == root.pwd:
+                    print("rmdir: Cannot remove pwd")
+                elif dir.type =="file":
+                    print("rmdir: Not a directory")
+                elif len(dir.child) > 0:
+                    print("rmdir: Directory not empty")
                 else:
-                    dir.parent.rmdir(dir)
+                    if dir.parent == None:
+                        root.rmdir(dir)
+                    else:
+                        dir.parent.rmdir(dir)
 
         elif command[0] == 'cp':
-            path = command[1].split("/")
-            path2 = command[2].split("/")
-
-            source = root.pathexist(path)
-            dis = root.pathexist(path2)
-
-            if (dis !=False and dis.type == "file"):
-                print("cp: File exists")
-            elif source == False:
-                print("cp: No such file")
-            elif (dis !=False and dis.type == "directory"):
-                print("cp: Destination is a directory")
-            elif source.type == "directory":
-                print("cp: Source is a directory")
+            if len(command)!=3:
+                print("cp: Invalid syntax")
             else:
-                dis = root.pathexist(path2[:-1])
-                if dis == False or dis.type == "file":
-                    print("cp: No such file or directory")
+                path = command[1].split("/")
+                path2 = command[2].split("/")
+
+                source = root.pathexist(path)
+                dis = root.pathexist(path2)
+
+                if (dis !=False and dis.type == "file"):
+                    print("cp: File exists")
+                elif source == False:
+                    print("cp: No such file")
+                elif (dis !=False and dis.type == "directory"):
+                    print("cp: Destination is a directory")
+                elif source.type == "directory":
+                    print("cp: Source is a directory")
                 else:
-                    dis.addfile(path2[-1])
+                    dis = root.pathexist(path2[:-1])
+                    if dis == False or dis.type == "file":
+                        print("cp: No such file or directory")
+                    else:
+                        dis.addfile(path2[-1])
 
         elif command[0] == 'mv':
-            path = command[1].split("/")
-            path2 = command[2].split("/")
-
-            source = root.pathexist(path)
-            dis = root.pathexist(path2)
-
-            if (dis !=False and dis.type == "file"):
-                print("mv: File exists")
-            elif source == False:
-                print("mv: No such file")
-            elif (dis !=False and dis.type == "directory"):
-                print("mv: Destination is a directory")
-            elif source.type == "directory":
-                print("mv: Source is a directory")
+            if len(command)!=3:
+                print("mv: Invalid syntax")
             else:
-                dis = root.pathexist(path2[:-1])
-                if dis == False or dis.type == "file":
-                    print("mv: No such file or directory")
+                path = command[1].split("/")
+                path2 = command[2].split("/")
+
+                source = root.pathexist(path)
+                dis = root.pathexist(path2)
+
+                if (dis !=False and dis.type == "file"):
+                    print("mv: File exists")
+                elif source == False:
+                    print("mv: No such file")
+                elif (dis !=False and dis.type == "directory"):
+                    print("mv: Destination is a directory")
+                elif source.type == "directory":
+                    print("mv: Source is a directory")
                 else:
-                    source.parent.rm(source)
-                    source.parent = dis
-                    source.name = path2[-1]
-                    dis.child.append(source)
+                    dis = root.pathexist(path2[:-1])
+                    if dis == False or dis.type == "file":
+                        print("mv: No such file or directory")
+                    else:
+                        source.parent.rm(source)
+                        source.parent = dis
+                        source.name = path2[-1]
+                        dis.child.append(source)
 
         else:
-            print(f'{original}: command not found')
-        original = input(root.pwd)
-        command = original.split(" ")
+            print(f'{command[0]}: Command not found')
     print(f"bye, {root.user}")
 
 
