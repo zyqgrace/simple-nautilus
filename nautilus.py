@@ -106,6 +106,8 @@ def main():
             elif pathexist(file[:-1],root)!=False:
                 temp = pathexist(file[:-1],root)
                 temp.addfile(file[-1])
+            else:
+                print("touch: Ancestor directory does not exist")
         
         elif command[0] == 'ls':
             for child in root.pwd.child:
