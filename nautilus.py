@@ -39,7 +39,7 @@ def pathexist(path,root):
         cur = root.pwd
     i = 0
     while i < len(path):
-        if path[i]==".":
+        if path[i] == ".":
             i+=1
         elif path[i] == "..":
             if cur.parent == None:
