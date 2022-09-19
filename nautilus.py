@@ -1,4 +1,4 @@
-class Tree():
+class Namespace():
     def __init__(self,name = "/", parent = None):
         self.user = "root"
         self.parent = parent
@@ -11,11 +11,11 @@ class Tree():
         return f'{self.user}:{self.absolutepath()}$ '
 
     def adddirectory(self,filename):
-        dir = Tree(filename,self)
+        dir = Namespace(filename,self)
         self.child.append(dir)
     
     def addfile(self,filename):
-        file = Tree(filename,self)
+        file = Namespace(filename,self)
         file.type = "file"
         self.child.append(file)
 
@@ -29,40 +29,41 @@ class Tree():
     def cd(self,path):
         self.pwd = path
 
-def pathexist(path,root):
-    if path == ["",""]:
-        return root
-    cur = root
-    if path[0]=="":
-        path = path[1:]
-    else:
-        cur = root.pwd
-    i = 0
-    while i < len(path):
-        if path[i] == ".":
-            i+=1
-        elif path[i] == "..":
-            if cur.parent == None:
-                return cur
-            cur = cur.parent
-            i+=1
+    # if the path exist, return the path, else it would return False
+    def pathexist(self,path):
+        if path == ["",""]:
+            return self
+        cur = self
+        if path[0]=="":
+            path = path[1:]
         else:
-            if len(cur.child)==0:
-                return False
-            found = False
-            for file in cur.child:
-                if path[i] == file.name:
-                    cur = file
-                    i +=1
-                    found = True
-                    break
-            if not found:
-                return False
-    return cur
+            cur = self.pwd
+        i = 0
+        while i < len(path):
+            if path[i] == ".":
+                i+=1
+            elif path[i] == "..":
+                if cur.parent == None:
+                    return cur
+                cur = cur.parent
+                i+=1
+            else:
+                if len(cur.child)==0:
+                    return False
+                found = False
+                for file in cur.child:
+                    if path[i] == file.name:
+                        cur = file
+                        i +=1
+                        found = True
+                        break
+                if not found:
+                    return False
+        return cur
 
 def main():
     # TODO
-    root = Tree()
+    root = Namespace()
 
     original = input(root.pwd)
     command = original.split(" ")
@@ -75,7 +76,7 @@ def main():
             if len(command)==1:
                 print("cd: Invalid syntax")
             else:
-                temp = pathexist(command[1].split("/"),root)
+                temp = root.pathexist(command[1].split("/"))
                 if temp!=False:
                     if temp.type != "directory":
                         print("cd: Destination is a file")
@@ -89,21 +90,21 @@ def main():
                 dir = command[2].split("/")
                 i = 1
                 while i <= len(dir):
-                    if pathexist(dir[:i],root)!=False:
-                        temp = pathexist(dir[:i],root)
+                    if root.pathexist(dir[:i])!=False:
+                        temp = root.pathexist(dir[:i])
                     else:
-                        temp = pathexist(dir[:i-1],root)
+                        temp = root.pathexist(dir[:i-1])
                         temp.adddirectory(dir[i-1])
                         
                     i+=1
             else:
                 dir = command[1].split("/")
-                if pathexist(dir,root)!=False:
+                if root.pathexist(dir)!=False:
                     print("mkdir: File exists")
                 elif len(dir)==1:
                     root.pwd.adddirectory(dir[0])
-                elif pathexist(dir[:-1],root)!=False:
-                    temp = pathexist(dir[:-1],root)
+                elif root.pathexist(dir[:-1])!=False:
+                    temp = root.pathexist(dir[:-1])
                     temp.adddirectory(dir[-1])
                 else:
                     print("mkdir: Ancestor directory does not exist")
@@ -112,8 +113,8 @@ def main():
             file = command[1].split("/")
             if len(file)==1:
                 root.pwd.addfile(file[0])
-            elif pathexist(file[:-1],root)!=False:
-                temp = pathexist(file[:-1],root)
+            elif root.pathexist(file[:-1])!=False:
+                temp = root.pathexist(file[:-1])
                 temp.addfile(file[-1])
             else:
                 print("touch: Ancestor directory does not exist")
@@ -129,9 +130,9 @@ def main():
                     if child.name == path[0]:
                         root.pwd.child.remove(child)
             else:
-                temp = pathexist(path[:-1],root)
+                temp = root.pathexist(path[:-1])
                 for child in temp.child:
-                    if child == pathexist(path,root):
+                    if child == root.pathexist(path):
                         temp.child.remove(child)
                         ##test
 
@@ -142,13 +143,15 @@ def main():
                     if child.name == path[0]:
                         source = child
             else:
-                source = pathexist(path,root)
+                source = root.pathexist(path)
             path2 = command[2].split("/")
+            if root.pathexist(path2):
+                print("p: File exists")
             if len(path2)==1:
                 source.name = path2[0]
                 root.pwd.child.append(source)
             else:
-                dis = pathexist(path2[:-1],root)
+                dis = root.pathexist(path2[:-1])
                 source.name = path2[-1]
                 dis.child.append(source)
 
