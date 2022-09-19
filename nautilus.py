@@ -51,8 +51,9 @@ class Namespace():
                 i+=1
             elif path[i] == "..":
                 if cur.parent == None:
-                    return cur
-                cur = cur.parent
+                    pass
+                else:
+                    cur = cur.parent
                 i+=1
             else:
                 if len(cur.child)==0:
@@ -91,14 +92,14 @@ def main():
                 dir = command[2].split("/")
                 if root.pathexist(dir[0])==False:
                     root.pwd.adddirectory(dir[0])
-                    i = 1
-                    while i <= len(dir):
-                        if root.pathexist(dir[:i])!=False:
-                            temp = root.pathexist(dir[:i])
-                        else:
-                            temp = root.pathexist(dir[:i-1])
-                            temp.adddirectory(dir[i-1])
-                        i+=1
+                i = 1
+                while i <= len(dir):
+                    if root.pathexist(dir[:i])!=False:
+                        temp = root.pathexist(dir[:i])
+                    else:
+                        temp = root.pathexist(dir[:i-1])
+                        temp.adddirectory(dir[i-1])
+                    i+=1
             else:
                 dir = command[1].split("/")
                 if root.pathexist(dir)!=False:
@@ -145,14 +146,14 @@ def main():
             source = root.pathexist(path)
             dis = root.pathexist(path2)
 
-            if source == False:
-                print("cp: No such file")
-            elif source.type == "directory":
-                print("cp: Source is a directory")
-            elif (dis !=False and dis.type == "file"):
+            if (dis !=False and dis.type == "file"):
                 print("cp: File exists")
+            elif source == False:
+                print("cp: No such file")
             elif (dis !=False and dis.type == "directory"):
                 print("cp: Destination is a directory")
+            elif source.type == "directory":
+                print("cp: Source is a directory")
             else:
                 dis = root.pathexist(path2[:-1])
                 if dis == False:
