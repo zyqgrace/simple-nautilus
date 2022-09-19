@@ -35,6 +35,17 @@ class Namespace():
                 print("cd: Destination is a file")
             else:
                 self.pwd = temp
+    
+    def rm(self,child):
+        for c in self.child:
+            if child.name == c.name and c.type=="file":
+                self.child.remove(c)
+    
+    def rmdir(self,child):
+        for c in self.child:
+            if child.name == c.name and c.type=="directory":
+                self.child.remove(c)
+
 
     # if the path exist, return the path, else it would return False
     def pathexist(self,path):
@@ -126,18 +137,35 @@ def main():
             for child in root.pwd.child:
                 print(child.name)
         
-        elif command[0] == 'rm' or command[0] == 'rmdir':
+        elif command[0] == 'rm':
             path = command[1].split("/")
-            if len(path)==1:
-                for child in root.pwd.child:
-                    if child.name == path[0]:
-                        root.pwd.child.remove(child)
+            file = root.pathexist(path)
+            if file == False:
+                print("rm: No such file")
+            elif file.type =="directory":
+                print("rm: Is a directory")
             else:
-                temp = root.pathexist(path[:-1])
-                for child in temp.child:
-                    if child == root.pathexist(path):
-                        temp.child.remove(child)
-                        ##test
+                if file.parent == None:
+                    root.rm(file)
+                else:
+                    file.parent.rm(file)
+
+        elif command[0] == 'rmdir':
+            path = command[1].split("/")
+            dir = root.pathexist(path)
+            if dir == False:
+                print("rmdir: No such file or directory")
+            elif dir == root.pwd:
+                print("rmdir: Cannot remove pwd")
+            elif dir.type =="file":
+                print("rmdir: Not a directory")
+            elif len(dir.child) > 0:
+                print("rmdir: Directory not empty")
+            else:
+                if dir.parent == None:
+                    root.rmdir(dir)
+                else:
+                    dir.parent.rmdir(dir)
 
         elif command[0] == 'cp':
             path = command[1].split("/")
@@ -160,6 +188,7 @@ def main():
                     print("cp: No such file or directory")
                 else:
                     dis.child.append(source)
+
         elif command[0] == 'mv':
             path = command[1].split("/")
             path2 = command[2].split("/")
@@ -180,7 +209,9 @@ def main():
                 if dis == False or dis.type == "file":
                     print("mv: No such file or directory")
                 else:
+                    source.parent.rm(source)
                     source.parent = dis
+                    source.name = path2[-1]
                     dis.child.append(source)
 
         else:
