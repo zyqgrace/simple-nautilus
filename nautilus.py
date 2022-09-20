@@ -1,12 +1,12 @@
 class Namespace():
-    def __init__(self,name = "/", parent = None):
-        self.user = "root"
+    def __init__(self,name = "/", parent = None,user = "root"):
+        self.user = user
         self.parent = parent
         self.pwd = self
         self.name = name
         self.child = []
         self.type = "directory"
-        self.file_permission = None
+        self.file_permission = "drwxr-x"
 
     def __str__(self):
         return f'{self.user}:{self.absolutepath()}$ '
@@ -17,7 +17,7 @@ class Namespace():
         self.child.append(dir)
     
     def addfile(self,filename):
-        file = Namespace(filename,self)
+        file = Namespace(filename,self,self.user)
         file.type = "file"
         file.file_permission = "-rw-r--"
         self.child.append(file)
@@ -385,6 +385,19 @@ def main():
         elif command[0]== "chmod":
             file = cur_user.pathexist(command[2].split("/"))
             file.chmod(command[1])
+        
+        elif command[0]=="chown":
+            if cur_user != root:
+                print("chown: Operation not permitted")
+            else:
+                temp_user = user_exist(command[1],users)
+                file = cur_user.pathexist(command[2].split("/"))
+                if temp_user == False:
+                    print("chown: Invalid user")
+                elif file == False:
+                    print("chown: No such file or directory")
+                else:
+                    file.user = temp_user
 
         else:
             print(f'{command[0]}: Command not found')
