@@ -126,36 +126,67 @@ def user_command(pwd):
         return command[0], valid
     return command, valid
 
+def user_exist(name,users):
+    for u in users:
+        if name == u.user:
+            return u
+    return False
+
 def main():
     # TODO
     root = Namespace()
-
+    cur_user = root
+    users = [root]
     while True:
-        command_valid = user_command(root.pwd)
+        command_valid = user_command(cur_user.pwd)
         command = command_valid[0]
         valid = command_valid[1]
+
         if not valid:
             print(f"{command}: Invalid syntax")
             continue
+
         if command == []:
             pass
-        elif command[0]== "exit":
+        elif command[0] == "exit":
             if len(command)!=1:
                 print("exit: Invalid syntax")
             else:
                 break
+
+        elif command[0] == "adduser":
+            if user_exist(command[1],users) !=False:
+                print("adduser: The user already exists")
+            else:
+                new_user = Namespace()
+                new_user.user = command[1]
+                users.append(new_user)
+
+        elif command[0] == "su":
+            if len(command)==1:
+                cur_user = root
+            else:
+                if user_exist(command[1],users)==False:
+                    print("su: Invalid user")
+                else:
+                    cur_user = user_exist(command[1],users)
+        
+        elif command[0]=="deluser":
+            unwant_user = user_exist(command[1],users)
+            users.remove(unwant_user)
+        
         elif command[0] == "pwd":
             if len(command)>1:
                 print("pwd: Invalid syntax")
             else:
-                print(root.pwd.absolutepath())
+                print(cur_user.pwd.absolutepath())
 
         elif command[0] == 'cd':
             if len(command)!=2:
                 print("cd: Invalid syntax")
             else:
                 path = command[1].split("/")
-                root.cd(path)
+                cur_user.cd(path)
 
         elif command[0] == 'mkdir':
             if len(command)!=2 and len(command)!=3:
@@ -164,24 +195,24 @@ def main():
                 print("mkdir: Invalid syntax")
             elif command[1] == '-p':
                 dir = command[2].split("/")
-                if root.pathexist(dir[0])==False:
-                    root.pwd.adddirectory(dir[0])
+                if cur_user.pathexist(dir[0])==False:
+                    cur_user.pwd.adddirectory(dir[0])
                 i = 1
                 while i <= len(dir):
-                    if root.pathexist(dir[:i])!=False:
-                        temp = root.pathexist(dir[:i])
+                    if cur_user.pathexist(dir[:i])!=False:
+                        temp = cur_user.pathexist(dir[:i])
                     else:
-                        temp = root.pathexist(dir[:i-1])
+                        temp = cur_user.pathexist(dir[:i-1])
                         temp.adddirectory(dir[i-1])
                     i+=1
             else:
                 dir = command[1].split("/")
-                if root.pathexist(dir)!=False:
+                if cur_user.pathexist(dir)!=False:
                     print("mkdir: File exists")
                 elif len(dir)==1:
-                    root.pwd.adddirectory(dir[0])
-                elif root.pathexist(dir[:-1])!=False:
-                    temp = root.pathexist(dir[:-1])
+                    cur_user.pwd.adddirectory(dir[0])
+                elif cur_user.pathexist(dir[:-1])!=False:
+                    temp = cur_user.pathexist(dir[:-1])
                     temp.adddirectory(dir[-1])
                 else:
                     print("mkdir: Ancestor directory does not exist")
@@ -192,15 +223,15 @@ def main():
             else:
                 file = command[1].split("/")
                 if len(file)==1:
-                    root.pwd.addfile(file[0])
-                elif root.pathexist(file[:-1])!=False:
-                    temp = root.pathexist(file[:-1])
+                    cur_user.pwd.addfile(file[0])
+                elif cur_user.pathexist(file[:-1])!=False:
+                    temp = cur_user.pathexist(file[:-1])
                     temp.addfile(file[-1])
                 else:
                     print("touch: Ancestor directory does not exist")
         
         elif command[0] == 'ls':
-            for child in root.pwd.child:
+            for child in cur_user.pwd.child:
                 print(child.name)
         
         elif command[0] == 'rm':
@@ -208,14 +239,14 @@ def main():
                 print("rm: Invalid syntax")
             else:
                 path = command[1].split("/")
-                file = root.pathexist(path)
+                file = cur_user.pathexist(path)
                 if file == False:
                     print("rm: No such file")
                 elif file.type =="directory":
                     print("rm: Is a directory")
                 else:
                     if file.parent == None:
-                        root.rm(file)
+                        cur_user.rm(file)
                     else:
                         file.parent.rm(file)
 
@@ -224,10 +255,10 @@ def main():
                 print("rmdir: Invalid syntax")
             else:
                 path = command[1].split("/")
-                dir = root.pathexist(path)
+                dir = cur_user.pathexist(path)
                 if dir == False:
                     print("rmdir: No such file or directory")
-                elif dir == root.pwd:
+                elif dir == cur_user.pwd:
                     print("rmdir: Cannot remove pwd")
                 elif dir.type =="file":
                     print("rmdir: Not a directory")
@@ -235,7 +266,7 @@ def main():
                     print("rmdir: Directory not empty")
                 else:
                     if dir.parent == None:
-                        root.rmdir(dir)
+                        cur_user.rmdir(dir)
                     else:
                         dir.parent.rmdir(dir)
 
@@ -246,8 +277,8 @@ def main():
                 path = command[1].split("/")
                 path2 = command[2].split("/")
 
-                source = root.pathexist(path)
-                dis = root.pathexist(path2)
+                source = cur_user.pathexist(path)
+                dis = cur_user.pathexist(path2)
 
                 if (dis !=False and dis.type == "file"):
                     print("cp: File exists")
@@ -258,7 +289,7 @@ def main():
                 elif source.type == "directory":
                     print("cp: Source is a directory")
                 else:
-                    dis = root.pathexist(path2[:-1])
+                    dis = cur_user.pathexist(path2[:-1])
                     if dis == False or dis.type == "file":
                         print("cp: No such file or directory")
                     else:
@@ -271,8 +302,8 @@ def main():
                 path = command[1].split("/")
                 path2 = command[2].split("/")
 
-                source = root.pathexist(path)
-                dis = root.pathexist(path2)
+                source = cur_user.pathexist(path)
+                dis = cur_user.pathexist(path2)
 
                 if (dis !=False and dis.type == "file"):
                     print("mv: File exists")
@@ -283,7 +314,7 @@ def main():
                 elif source.type == "directory":
                     print("mv: Source is a directory")
                 else:
-                    dis = root.pathexist(path2[:-1])
+                    dis = cur_user.pathexist(path2[:-1])
                     if dis == False or dis.type == "file":
                         print("mv: No such file or directory")
                     else:
@@ -294,7 +325,7 @@ def main():
 
         else:
             print(f'{command[0]}: Command not found')
-    print(f"bye, {root.user}")
+    print(f"bye, {cur_user.user}")
 
 
 if __name__ == '__main__':
