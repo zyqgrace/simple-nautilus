@@ -138,7 +138,7 @@ def remove_space(command):
 def user_command(pwd):
     valid = True
     temp = input(pwd)
-    temp = temp.strip("\t")
+    temp = temp.strip("\t").strip("\n")
     valid_list = [",","-","_","\""," ", "+","=",".","/"]
     quote = False
     i = 0
