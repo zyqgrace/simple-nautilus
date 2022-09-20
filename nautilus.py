@@ -80,6 +80,14 @@ class Namespace():
                     return False
         return cur
 
+def remove_space(command):
+    if command[0]==" ":
+        return remove_space(command[1:])
+    elif command[-1]==" ":
+        return remove_space(command[:-1])
+    else:
+        return command
+
 def user_command(pwd):
     valid = True
     temp = input(pwd)
@@ -111,6 +119,7 @@ def user_command(pwd):
         if command[j] == "":
             command.pop(j)
         else:
+            command[j] = remove_space(command[j])
             j+=1
 
     if not valid:
