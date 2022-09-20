@@ -1,5 +1,5 @@
 class Namespace():
-    def __init__(self,name = "/", parent = None,user = "root"):
+    def __init__(self,name = "/", parent = None, user = "root"):
         self.user = user
         self.pwd = self
         self.parent = parent
@@ -13,6 +13,7 @@ class Namespace():
             return "/"
         if self.parent.parent != None:
             return self.parent.absolute_path() + "/" + self.name
+        return "/" + self.name
     
     def __str__(self):
         return self.absolute_path()
@@ -86,7 +87,9 @@ class Namespace():
         elif command[1] == '-p':
             dir = command[2].split("/")
             if self.pathexist(dir[0]) == False:
-                self.pwd.add_directory(dir[0])
+                d = Namespace(dir[i-1], self.pwd, self.pwd.user)
+                d.file_permission = "drwxr-x"
+                self.pwd.child.add(d)
             i = 1
             while i <= len(dir):
                 if self.pathexist(dir[:i]) != False:
@@ -100,17 +103,23 @@ class Namespace():
                         break
                 else:
                     temp = self.pathexist(dir[:i-1])
-                    temp.add_directory(dir[i-1])
+                    d = Namespace(dir[i-1], temp, temp.user)
+                    d.file_permission = "drwxr-x"
+                    temp.child.add(d)
                 i+=1
         else:
             dir = command[1].split("/")
             if self.pathexist(dir)!=False:
                 print("mkdir: File exists")
             elif len(dir)==1:
-                self.pwd.add_directory(dir[0])
+                dir = Namespace(dir[0], self, self.user)
+                dir.file_permission = "drwxr-x"
+                self.child.add(dir)
             elif self.pathexist(dir[:-1])!=False:
                 temp = self.pathexist(dir[:-1])
-                temp.add_directory(dir[-1])
+                dir = Namespace(dir[0], temp, temp.user)
+                dir.file_permission = "drwxr-x"
+                temp.child.add(dir)
             else:
                 print("mkdir: Ancestor directory does not exist")
     
@@ -315,7 +324,7 @@ def input_command(pwd):
     '''
     valid = True
     quote = False
-    temp = input(pwd.user+":"+str(pwd)+"$ ")
+    temp = input(pwd.user+":"+pwd.absolute_path()+"$ ")
     valid_list = { "-", "_", "\"", " ", "+",\
          "=", ".", "/", "\t", "\n", "\r", "\v"}
 
@@ -342,11 +351,8 @@ def input_command(pwd):
                     command.append(temp[start:i])
                 start = i + 1
         i += 1
-    if start != len(temp):
+    if start < len(temp):
         command.append(temp[start:])
-
-    if not valid:
-        return command[0], valid
     return command, valid
 
 def main():
@@ -359,8 +365,9 @@ def main():
         command_line = input_command(cur_user.pwd)
         command = command_line[0]
         valid = command_line[1]
-        all_commands = {'pwd', 'cd', 'exit', 'ls',"mkdir", "cp",\
-            "touch", "mv", "chmod", "chown", "su", "adduser", "deluser"}
+        all_commands = {'pwd', 'cd', 'exit', 'ls',"mkdir", "cp", "rm",\
+            "touch", "mv", "chmod", "chown", "su", "adduser", "deluser",\
+                "rmdir"}
         if not valid:
             print(f"{command[0]}: Invalid syntax")
             continue
