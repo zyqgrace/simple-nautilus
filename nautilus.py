@@ -171,17 +171,11 @@ def user_command(pwd):
         return command[0], valid
     return command, valid
 
-def user_exist(name,users):
-    for u in users:
-        if name == u.user:
-            return u
-    return False
-
 def main():
     # TODO
     root = Namespace()
     cur_user = root
-    users = [root]
+    users = ["root"]
     while True:
         command_valid = user_command(cur_user.pwd)
         command = command_valid[0]
@@ -200,27 +194,25 @@ def main():
                 break
 
         elif command[0] == "adduser":
-            if user_exist(command[1],users) !=False:
+            if command[1] in users:
                 print("adduser: The user already exists")
             else:
-                new_user = Namespace()
-                new_user.user = command[1]
-                users.append(new_user)
+                users.append(command[1])
 
         elif command[0] == "su":
             if len(command)==1:
-                cur_user = root
+                cur_user.user = "root"
             else:
-                if user_exist(command[1],users)==False:
+                if not(command[1] in users):
                     print("su: Invalid user")
                 else:
-                    cur_user = user_exist(command[1],users)
+                    cur_user.user = command[1]
         
         elif command[0]=="deluser":
-            unwant_user = user_exist(command[1],users)
-            if unwant_user == False:
+            unwant_user = command[1]
+            if not(unwant_user in users):
                 print("deluser: The user does not exist")
-            elif unwant_user == root:
+            elif unwant_user == "root":
                 print("WARNING: You are just about to delete the root account")
                 print("Usually this is never required as it may render the whole system unusable")
                 print("If you really want this, call deluser with parameter --force")
@@ -285,10 +277,15 @@ def main():
                     print("touch: Ancestor directory does not exist")
         
         elif command[0] == 'ls':
-            if len(command)==2: 
-                if command[1]=="-l":
+            if len(command) >= 2: 
+                if command[1]=="-l" and len(command)==2:
                     for child in cur_user.pwd.child:
                         print(child.file_permission + " " + child.user + " " +child.name)
+                elif len(command)==3:
+                    file = cur_user.pathexist(command[2].split("/"))
+                    for child in file.child:
+                        print(child.file_permission + " " + child.user + " " +child.name)
+
             else:
                 for child in cur_user.pwd.child:
                     print(child.name)
@@ -387,17 +384,16 @@ def main():
             file.chmod(command[1])
         
         elif command[0]=="chown":
-            if cur_user != root:
+            if cur_user.user != "root":
                 print("chown: Operation not permitted")
             else:
-                temp_user = user_exist(command[1],users)
                 file = cur_user.pathexist(command[2].split("/"))
-                if temp_user == False:
+                if not(command[1] in users):
                     print("chown: Invalid user")
                 elif file == False:
                     print("chown: No such file or directory")
                 else:
-                    file.user = temp_user
+                    file.user = command[1]
 
         else:
             print(f'{command[0]}: Command not found')
