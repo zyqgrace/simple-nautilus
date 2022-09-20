@@ -1,9 +1,9 @@
 def remove_space(command):
     if command == "":
         return command
-    if command[0]==" ":
+    if command[0]==" " or command[0]=="\t":
         return remove_space(command[1:])
-    elif command[-1]==" ":
+    elif command[-1]==" " or command[-1]=="\t":
         return remove_space(command[:-1])
     else:
         return command
@@ -11,7 +11,8 @@ def remove_space(command):
 def user_command(pwd):
     valid = True
     temp = input(pwd)
-    valid_list = [",","-","_","\""," ", "+","=",".","/"]
+    temp = temp.strip("\t")
+    valid_list = [",","-","_","\""," ", "+","=",".","/",]
     quote = False
     i = 0
     start = 0
