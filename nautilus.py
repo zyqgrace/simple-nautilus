@@ -109,13 +109,12 @@ class Namespace():
             elif char in ["r","x","w"]:
                 perm.append(char)
 
-        if sign == "=":
-            i = 1
-            while i < len(cur_perm):
-                cur_perm[i]="-"
-                i += 1
-
         for u in user:
+            if sign == "=":
+                i = 0
+                while i < 3:
+                    cur_perm[index[u]+i]="-"
+                    i+=1
             for p in perm:
                 ind = index[u]+index[p]
                 if sign == "-":
@@ -137,7 +136,7 @@ def remove_space(command):
 def user_command(pwd):
     valid = True
     temp = input(pwd)
-    valid_list = [",","-","_","\""," ","+","="]
+    valid_list = [",","-","_","\""," ","+","=",".","/"]
     quote = False
     i = 0
     start = 0
