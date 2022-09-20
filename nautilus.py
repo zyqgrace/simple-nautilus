@@ -6,17 +6,20 @@ class Namespace():
         self.name = name
         self.child = []
         self.type = "directory"
+        self.file_permission = None
 
     def __str__(self):
         return f'{self.user}:{self.absolutepath()}$ '
 
     def adddirectory(self,filename):
         dir = Namespace(filename,self)
+        dir.file_permission = "drwxr-x"
         self.child.append(dir)
     
     def addfile(self,filename):
         file = Namespace(filename,self)
         file.type = "file"
+        file.file_permission = "-rw-r--"
         self.child.append(file)
 
     def absolutepath(self):
@@ -79,6 +82,49 @@ class Namespace():
                 if not found:
                     return False
         return cur
+    
+    def chmod(self,command):
+        cur_perm = []
+        for perm in self.file_permission:
+            cur_perm.append(perm)
+        user = []
+        sign = None
+        perm = []
+        index = {
+            "u" : 1,
+            "o" : 4,
+            "r" : 0,
+            "w" : 1,
+            "x" : 2,
+        }
+        for char in command:
+            if char in ["u","o","a"]:
+                if char == "a":
+                    user.append("u")
+                    user.append("o")
+                else:
+                    user.append(char)
+            elif char in ["+","=","-"]:
+                sign = char
+            elif char in ["r","x","w"]:
+                perm.append(char)
+
+        if sign == "=":
+            i = 1
+            while i < len(cur_perm):
+                cur_perm[i]="-"
+                i += 1
+
+        for u in user:
+            for p in perm:
+                ind = index[u]+index[p]
+                if sign == "-":
+                    cur_perm[ind]="-"
+                else:
+                    cur_perm[ind]= p
+        self.file_permission = ""
+        for p in cur_perm:
+            self.file_permission += p
 
 def remove_space(command):
     if command[0]==" ":
@@ -91,15 +137,15 @@ def remove_space(command):
 def user_command(pwd):
     valid = True
     temp = input(pwd)
-    invalid_list = ["@","#","!","$","%","^","*","("]
+    valid_list = [",","-","_","\""," ","+","="]
     quote = False
     i = 0
     start = 0
     command = []
     while i < len(temp):
-        if temp[i] in invalid_list:
+        if not temp[i].isalpha() and not(temp[i].isnumeric()) and not(temp[i] in valid_list):
             valid = False
-        if quote:
+        elif quote:
             if temp[i] == "\"":
                 quote = False
                 command.append(temp[start:i])
@@ -240,8 +286,13 @@ def main():
                     print("touch: Ancestor directory does not exist")
         
         elif command[0] == 'ls':
-            for child in cur_user.pwd.child:
-                print(child.name)
+            if len(command)==2: 
+                if command[1]=="-l":
+                    for child in cur_user.pwd.child:
+                        print(child.file_permission + " " + child.user + " " +child.name)
+            else:
+                for child in cur_user.pwd.child:
+                    print(child.name)
         
         elif command[0] == 'rm':
             if len(command)!=2:
@@ -331,6 +382,10 @@ def main():
                         source.parent = dis
                         source.name = path2[-1]
                         dis.child.append(source)
+
+        elif command[0]== "chmod":
+            file = cur_user.pathexist(command[2].split("/"))
+            file.chmod(command[1])
 
         else:
             print(f'{command[0]}: Command not found')
