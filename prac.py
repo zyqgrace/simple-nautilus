@@ -11,13 +11,13 @@ class Namespace():
     def __str__(self):
         return f'{self.user}:{self.absolutepath()}$ '
 
-    def adddirectory(self, filename):
-        dir = Namespace(filename, self)
+    def adddirectory(self,filename):
+        dir = Namespace(filename,self)
         dir.file_permission = "drwxr-x"
         self.child.append(dir)
     
-    def addfile(self, filename):
-        file = Namespace(filename, self, self.user)
+    def addfile(self,filename):
+        file = Namespace(filename,self,self.user)
         file.type = "file"
         file.file_permission = "-rw-r--"
         self.child.append(file)
@@ -29,34 +29,33 @@ class Namespace():
             return self.parent.absolutepath() + "/" + self.name
         return "/" + self.name
     
-    def cd(self, path):
+    def cd(self,path):
         temp = self.pathexist(path)
-        if temp == False:
+        if temp==False:
             print('cd: No such file or directory')
-        elif temp.file_permission[3]!="x":
-            print("cd: Permission denied")
         else:
             if temp.type == "file":
                 print("cd: Destination is a file")
             else:
                 self.pwd = temp
     
-    def rm(self, child):
+    def rm(self,child):
         for c in self.child:
-            if child.name == c.name and c.type == "file":
+            if child.name == c.name and c.type=="file":
                 self.child.remove(c)
     
-    def rmdir(self, child):
+    def rmdir(self,child):
         for c in self.child:
-            if child.name == c.name and c.type == "directory":
+            if child.name == c.name and c.type=="directory":
                 self.child.remove(c)
 
+
     # if the path exist, return the path, else it would return False
-    def pathexist(self, path):
-        if path == ["", ""]:
+    def pathexist(self,path):
+        if path == ["",""]:
             return self
         cur = self
-        if path[0] == "":
+        if path[0]=="":
             path = path[1:]
         else:
             cur = self.pwd
@@ -84,7 +83,7 @@ class Namespace():
                     return False
         return cur
     
-    def chmod(self, command):
+    def chmod(self,command):
         cur_perm = []
         for perm in self.file_permission:
             cur_perm.append(perm)
@@ -114,14 +113,14 @@ class Namespace():
             if sign == "=":
                 i = 0
                 while i < 3:
-                    cur_perm[index[u]+i] = "-"
-                    i += 1
+                    cur_perm[index[u]+i]="-"
+                    i+=1
             for p in perm:
-                ind = index[u] + index[p]
+                ind = index[u]+index[p]
                 if sign == "-":
-                    cur_perm[ind] = "-"
+                    cur_perm[ind]="-"
                 else:
-                    cur_perm[ind] = p
+                    cur_perm[ind]= p
         self.file_permission = ""
         for p in cur_perm:
             self.file_permission += p
@@ -129,9 +128,9 @@ class Namespace():
 def remove_space(command):
     if command == "":
         return command
-    if command[0]==" " or command[0] == "\t":
+    if command[0]==" " or command[0]=="\t":
         return remove_space(command[1:])
-    elif command[-1] == " " or command[-1] == "\t":
+    elif command[-1]==" " or command[-1]=="\t":
         return remove_space(command[:-1])
     else:
         return command
@@ -140,7 +139,7 @@ def user_command(pwd):
     valid = True
     temp = input(pwd)
     temp = temp.strip("\t")
-    valid_list = [",", "-", "_", "\"", " ", "+", "=", ".", "/", "\t", "\n", "\r", "\v"]
+    valid_list = [",","-","_","\""," ", "+","=",".","/","\t","\n","\r","\v"]
     quote = False
     i = 0
     start = 0
@@ -193,7 +192,7 @@ def main():
             continue
 
         elif command[0] == "exit":
-            if len(command) != 1:
+            if len(command)!=1:
                 print("exit: Invalid syntax")
             else:
                 break
@@ -213,7 +212,7 @@ def main():
                 else:
                     cur_user.user = command[1]
         
-        elif command[0] == "deluser":
+        elif command[0]=="deluser":
             unwant_user = command[1]
             if not(unwant_user in users):
                 print("deluser: The user does not exist")
@@ -227,7 +226,7 @@ def main():
                 users.remove(unwant_user)
         
         elif command[0] == "pwd":
-            if len(command) > 1:
+            if len(command)>1:
                 print("pwd: Invalid syntax")
             else:
                 print(cur_user.pwd.absolutepath())
@@ -240,17 +239,17 @@ def main():
                 cur_user.cd(path)
 
         elif command[0] == 'mkdir':
-            if len(command)!= 2 and len(command) != 3:
+            if len(command)!=2 and len(command)!=3:
                 print("mkdir: Invalid syntax")
-            elif len(command) == 3 and command[1]!= "-p":
+            elif len(command)==3 and command[1]!="-p":
                 print("mkdir: Invalid syntax")
             elif command[1] == '-p':
                 dir = command[2].split("/")
-                if cur_user.pathexist(dir[0]) == False:
+                if cur_user.pathexist(dir[0])==False:
                     cur_user.pwd.adddirectory(dir[0])
                 i = 1
                 while i <= len(dir):
-                    if cur_user.pathexist(dir[:i]) != False:
+                    if cur_user.pathexist(dir[:i])!=False:
                         temp = cur_user.pathexist(dir[:i])
                     else:
                         temp = cur_user.pathexist(dir[:i-1])
@@ -275,55 +274,28 @@ def main():
                 file = command[1].split("/")
                 if len(file)==1:
                     cur_user.pwd.addfile(file[0])
-                elif cur_user.pathexist(file[:-1]) != False:
+                elif cur_user.pathexist(file[:-1])!=False:
                     temp = cur_user.pathexist(file[:-1])
                     temp.addfile(file[-1])
                 else:
                     print("touch: Ancestor directory does not exist")
         
         elif command[0] == 'ls':
-            flag_l = False
-            flag_a = False
-            flag_d = False
-            files = []
-            cm_num = 1
-            if "-l" in command:
-                flag_l = True
-                cm_num += 1
-            if "-a" in command:
-                flag_a = True
-                cm_num += 1
-            if "-d" in command:
-                flag_d = True
-                cm_num += 1
-            if cm_num < len(command):
-                if root.pathexist(command[-1].split("/")) == False:
-                    print("ls: No such file or directory")
-                    continue
-                else:
-                    folder = root.pathexist(command[-1].split("/"))
+            if len(command) >= 2: 
+                if command[1]=="-l" and len(command)==2:
+                    for child in cur_user.pwd.child:
+                        print(child.file_permission + " " + child.user + " " +child.name)
+                elif len(command)==3:
+                    file = cur_user.pathexist(command[2].split("/"))
+                    for child in file.child:
+                        print(child.file_permission + " " + child.user + " " +child.name)
+
             else:
-                folder = cur_user.pwd
-            for c in folder.child:
-                files.append(c)
-            if flag_d:
-                for f in files:
-                    if f.type == "directory":
-                        files.remove(f)
-            elif flag_l: 
-                if flag_a:
-                    print(folder.file_permission + " " + folder.user + " .")
-                    print(folder.parent.file_permission + " " + folder.parent.user + " ..")
-                for child in files:
-                    print(child.file_permission + " " + child.user + " " +child.name)
-            else:
-                if flag_a:
-                    print(".\n..")
-                for child in files:
+                for child in cur_user.pwd.child:
                     print(child.name)
         
         elif command[0] == 'rm':
-            if len(command) != 2:
+            if len(command)!=2:
                 print("rm: Invalid syntax")
             else:
                 path = command[1].split("/")
@@ -359,7 +331,7 @@ def main():
                         dir.parent.rmdir(dir)
 
         elif command[0] == 'cp':
-            if len(command) != 3:
+            if len(command)!=3:
                 print("cp: Invalid syntax")
             else:
                 path = command[1].split("/")
@@ -372,7 +344,7 @@ def main():
                     print("cp: File exists")
                 elif source == False:
                     print("cp: No such file")
-                elif (dis != False and dis.type == "directory"):
+                elif (dis !=False and dis.type == "directory"):
                     print("cp: Destination is a directory")
                 elif source.type == "directory":
                     print("cp: Source is a directory")

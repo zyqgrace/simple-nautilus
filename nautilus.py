@@ -1,22 +1,22 @@
 class Namespace():
-    def __init__(self,name = "/", parent = None, user = "root"):
+    def __init__(self,name="/", parent=None, user="root"):
         self.user = user
+        self.name = name
         self.pwd = self
         self.parent = parent
-        self.name = name
-        self.child = set()
+        self.child = []
         self.type = "directory"
         self.file_permission = "drwxr-x"
     
+    def __str__(self):
+        return self.absolute_path()
+
     def absolute_path(self):
         if self.parent == None:
             return "/"
         if self.parent.parent != None:
             return self.parent.absolute_path() + "/" + self.name
         return "/" + self.name
-    
-    def __str__(self):
-        return self.absolute_path()
 
     def su(self, command, users):
         if len(command)==1:
@@ -61,14 +61,13 @@ class Namespace():
     
     def add_directory(self, filename):
         dir = Namespace(filename, self,self.user)
-        dir.file_permission = "drwxr-x"
-        self.child.add(dir)
+        self.child.append(dir)
 
     def add_file(self, filename):
         file = Namespace(filename, self, self.user)
         file.type = "file"
         file.file_permission = "-rw-r--"
-        self.child.add(file)
+        self.child.append(file)
 
     def touch(self,command):
         file = command[1].split("/")
@@ -87,39 +86,34 @@ class Namespace():
         elif command[1] == '-p':
             dir = command[2].split("/")
             if self.pathexist(dir[0]) == False:
-                d = Namespace(dir[i-1], self.pwd, self.pwd.user)
-                d.file_permission = "drwxr-x"
-                self.pwd.child.add(d)
+                self.pwd.add_directory(dir[0])
+
             i = 1
             while i <= len(dir):
                 if self.pathexist(dir[:i]) != False:
                     temp = self.pathexist(dir[:i])
                     if i == len(dir) - 1:
-                        if temp.file_permission[2] != "w":
+                        if not temp.check_perm(2):
                             print("mkdir: Permission denied")
                             break
-                    if temp.file_permission[3] != "x":
+                    if not temp.check_perm(3):
                         print("mkdir: Permission denied")
                         break
                 else:
                     temp = self.pathexist(dir[:i-1])
-                    d = Namespace(dir[i-1], temp, temp.user)
-                    d.file_permission = "drwxr-x"
-                    temp.child.add(d)
+                    temp.add_directory(dir[i-1])
                 i+=1
         else:
             dir = command[1].split("/")
-            if self.pathexist(dir)!=False:
+            if self.pathexist(dir) != False:
                 print("mkdir: File exists")
+
             elif len(dir)==1:
-                dir = Namespace(dir[0], self, self.user)
-                dir.file_permission = "drwxr-x"
-                self.child.add(dir)
-            elif self.pathexist(dir[:-1])!=False:
+                self.pwd.add_directory(dir[0])
+
+            elif self.pathexist(dir[:-1]) != False:
                 temp = self.pathexist(dir[:-1])
-                dir = Namespace(dir[0], temp, temp.user)
-                dir.file_permission = "drwxr-x"
-                temp.child.add(dir)
+                temp.add_directory(dir[-1])
             else:
                 print("mkdir: Ancestor directory does not exist")
     
@@ -128,13 +122,12 @@ class Namespace():
         temp = self.pathexist(path)
         if temp == False:
             print('cd: No such file or directory')
-        elif temp.file_permission[3]!="x":
+        elif not temp.check_perm(0):
+                print("cd: Destination is a file")
+        elif not temp.check_perm(3):
             print("cd: Permission denied")
         else:
-            if temp.type == "file":
-                print("cd: Destination is a file")
-            else:
-                self.pwd = temp
+            self.pwd = temp
 
     def cp(self,command):
         path = command[1].split("/")
@@ -191,14 +184,13 @@ class Namespace():
         elif file.type == "directory":
             print("rm: Is a directory")
         else:
-            if file.parent == None:
-                for c in self.child:
-                    if file.name == c.name and c.type == "file":
-                        self.child.remove(c)
-            else:
-                for c in file.parent.child:
-                    if file.name == c.name and c.type == "file":
-                        self.child.remove(c)
+            parent = file.parent
+            i = 0
+            while i < len(parent.child):
+                if file.name == parent.child[i].name \
+                    and parent.child[i].type == "file":
+                    parent.child.pop(i)
+                i += 1
 
     def rmdir(self,command):
         path = command[1].split("/")
@@ -212,14 +204,18 @@ class Namespace():
         elif len(dir.child) > 0:
             print("rmdir: Directory not empty")
         else:
-            if dir.parent == None:
+            parent = dir.parent
+            if parent == None:
                 for c in self.child:
                     if dir.name == c.name and c.type == "directory":
                         self.child.remove(c)
             else:
-                for c in dir.parent.child:
-                    if dir.name == c.name and c.type == "directory":
-                        self.child.remove(c)
+                i = 0
+                while i < len(parent.child):
+                    if dir.name == parent.child[i].name \
+                        and parent.child[i].type == "directory":
+                        parent.child.pop(i)
+                    i += 1
 
     def ls(self,command):
         flag_l = False
@@ -317,6 +313,20 @@ class Namespace():
             else:
                 file.user = command[1]
 
+    def check_perm(self, ind):
+        dic = {
+            0: 'd',
+            1: 'r',
+            2: 'w',
+            3: 'x',
+            4: 'r',
+            5: 'w',
+            6: 'x'
+        }
+        if self.file_permission[ind] == dic[ind]:
+            return True
+        return False
+
 def input_command(pwd):
     '''
     this function breaks the commandline input into a list of arguments 
@@ -324,7 +334,7 @@ def input_command(pwd):
     '''
     valid = True
     quote = False
-    temp = input(pwd.user+":"+pwd.absolute_path()+"$ ")
+    temp = input(pwd.user+":"+ str(pwd) +"$ ")
     valid_list = { "-", "_", "\"", " ", "+",\
          "=", ".", "/", "\t", "\n", "\r", "\v"}
 
@@ -353,6 +363,10 @@ def input_command(pwd):
         i += 1
     if start < len(temp):
         command.append(temp[start:])
+
+    for c in command:
+        if c == '':
+            command.remove(c)
     return command, valid
 
 def main():
@@ -393,13 +407,13 @@ def main():
             else:
                 users.remove(unwant_user)
         elif command[0] == 'pwd' and len(command) == 1:
-            print(cur_user)
+            print(cur_user.pwd)
         elif command[0] == 'exit' and len(command) == 1:
             break
         elif command[0] == 'touch' and len(command) == 2:
             cur_user.touch(command)
         elif command[0] == 'mkdir' and 2 <= len(command) <= 3:
-            cur_user.mkdir(command)
+            d = cur_user.mkdir(command)
         elif command[0] == "cd" and len(command) == 2:
             cur_user.cd(command)
         elif command[0] == "cp" and len(command) == 3:
