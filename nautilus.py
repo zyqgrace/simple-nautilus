@@ -126,6 +126,8 @@ class Namespace():
             self.file_permission += p
 
 def remove_space(command):
+    if command == "":
+        return command
     if command[0]==" ":
         return remove_space(command[1:])
     elif command[-1]==" ":
@@ -136,13 +138,13 @@ def remove_space(command):
 def user_command(pwd):
     valid = True
     temp = input(pwd)
-    valid_list = [",","-","_","\""," ","+","=",".","/"]
+    valid_list = [",","-","_","\""," ", "+","=",".","/"]
     quote = False
     i = 0
     start = 0
     command = []
     while i < len(temp):
-        if not temp[i].isalpha() and not(temp[i].isnumeric()) and not(temp[i] in valid_list):
+        if not(temp[i].isalpha()) and not(temp[i].isnumeric()) and not(temp[i] in valid_list):
             valid = False
         elif quote:
             if temp[i] == "\"":
@@ -184,9 +186,8 @@ def main():
         if not valid:
             print(f"{command}: Invalid syntax")
             continue
-
-        if command == []:
-            pass
+        elif command == []:
+            continue
         elif command[0] == "exit":
             if len(command)!=1:
                 print("exit: Invalid syntax")
