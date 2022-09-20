@@ -81,37 +81,54 @@ class Namespace():
         return cur
 
 def user_command(pwd):
-    original = input(pwd)
-    if "\"" in original:
-        i = 0
-        quote_ind = 0
-        command = []
-        while i < len(original):
-            if original[i]=="\"":
-                command.append(original[quote_ind:i])
-                quote_ind = i+1
-            i+=1
-        command[0]=command[0].strip(" ")
-    else:
-        i = 0
-        quote_ind = 0
-        command = []
-        while i < len(original):
-            if original[i]==" ":
-                command.append(original[quote_ind:i])
-                quote_ind = i+1
-            elif i == len(original)-1:
-                command.append(original[quote_ind:i+1])
-            i+=1
-    return command
+    valid = True
+    temp = input(pwd)
+    invalid_list = ["@","#","!","$","%","^","*","("]
+    quote = False
+    i = 0
+    start = 0
+    command = []
+    while i < len(temp):
+        if temp[i] in invalid_list:
+            valid = False
+        if quote:
+            if temp[i] == "\"":
+                quote = False
+                command.append(temp[start:i])
+                start = i + 2
+        else:
+            if temp[i] == "\"":
+                quote = True
+                start = i + 1
+            elif temp[i] == " ":
+                command.append(temp[start:i])
+                start = i + 1
+        i += 1
+    command.append(temp[start:])
+
+    j = 0
+    while j < len(command):
+        if command[j] == "":
+            command.pop(j)
+        else:
+            j+=1
+
+    if not valid:
+        return command[0], valid
+    return command, valid
 
 def main():
     # TODO
     root = Namespace()
 
     while True:
-        command = user_command(root.pwd)
-        if command == [] or command[0]=="":
+        command_valid = user_command(root.pwd)
+        command = command_valid[0]
+        valid = command_valid[1]
+        if not valid:
+            print(f"{command}: Invalid syntax")
+            continue
+        if command == []:
             pass
         elif command[0]== "exit":
             if len(command)!=1:
@@ -132,7 +149,9 @@ def main():
                 root.cd(path)
 
         elif command[0] == 'mkdir':
-            if len(command)!=2:
+            if len(command)!=2 and len(command)!=3:
+                print("mkdir: Invalid syntax")
+            elif len(command)==3 and command[1]!="-p":
                 print("mkdir: Invalid syntax")
             elif command[1] == '-p':
                 dir = command[2].split("/")
@@ -193,7 +212,7 @@ def main():
 
         elif command[0] == 'rmdir':
             if len(command) != 2:
-                print("rm: Invalid syntax")
+                print("rmdir: Invalid syntax")
             else:
                 path = command[1].split("/")
                 dir = root.pathexist(path)
