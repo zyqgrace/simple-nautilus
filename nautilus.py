@@ -173,7 +173,16 @@ def main():
         
         elif command[0]=="deluser":
             unwant_user = user_exist(command[1],users)
-            users.remove(unwant_user)
+            if unwant_user == False:
+                print("deluser: The user does not exist")
+            elif unwant_user == root:
+                print("WARNING: You are just about to delete the root account")
+                print("Usually this is never required as it may render the whole system unusable")
+                print("If you really want this, call deluser with parameter --force")
+                print("(but this `deluser` does not allow `--force`, haha)")
+                print("Stopping now without having performed any action")
+            else:
+                users.remove(unwant_user)
         
         elif command[0] == "pwd":
             if len(command)>1:
