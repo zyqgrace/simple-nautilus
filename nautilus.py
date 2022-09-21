@@ -311,7 +311,7 @@ class Namespace():
             elif file == False:
                 print("chown: No such file or directory")
             else:
-                file.user = command[1]
+                file.owner = command[1]
 
     def check_perm(self, ind):
         dic = {
