@@ -268,7 +268,7 @@ class Namespace():
             flag_num += 1
             flag_d = True
 
-        if (flag_num + 2) < len(command):
+        if (flag_num + 1) < len(command):
             folder = self.pathexist(command[-1].split("/"))
             if folder == False:
                 print("ls: No such file or directory")
@@ -294,7 +294,7 @@ class Namespace():
             folders.append(temp_file)
         else:
             if flag_d:
-                if flag_num + 2 < len(command):
+                if flag_num + 1 < len(command):
                     temp_file = [folder.file_permission, folder.owner, command[-1]]
                 else:
                     temp_file = [folder.file_permission, folder.owner, '.']
