@@ -274,10 +274,10 @@ class Namespace():
             folder = self.pwd
 
         if self.user != 'root':
-            if folder.check_perm(3) == False:
+            if folder.check_perm('x') == False:
                 print("ls: Permission denied")
                 return
-            if (not flag_d) and folder.parent.check_perm(3) == False:
+            if (not flag_d) and folder.parent.check_perm('x') == False:
                 print("ls: Permission denied")
                 return
             if check_ancestor_perm(folder,6) == False:
