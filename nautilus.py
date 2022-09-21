@@ -27,7 +27,7 @@ class Namespace():
             else:
                 self.user = command[1]
 
-    def pathexist(self, path):
+    def pathexist(self, path, type=['directory', 'file']):
         if path == ["", ""]:
             return self
         cur = self
@@ -50,11 +50,12 @@ class Namespace():
                     return False
                 found = False
                 for file in cur.child:
-                    if path[i] == file.name:
-                        cur = file
-                        i +=1
-                        found = True
-                        break
+                    if file.type in type:
+                        if path[i] == file.name:
+                            cur = file
+                            i +=1
+                            found = True
+                            break
                 if not found:
                     return False
         return cur
@@ -85,23 +86,24 @@ class Namespace():
                 print("mkdir: Invalid syntax")
         elif command[1] == '-p':
             dir = command[2].split("/")
-            if self.pathexist(dir[0]) == False:
+            first_dir = self.pathexist(dir[0],'directory')
+            if first_dir == False:
                 self.pwd.add_directory(dir[0])
 
             i = 1
             while i <= len(dir):
-                if self.pathexist(dir[:i]) != False:
-                    temp = self.pathexist(dir[:i])
+                temp_dir = self.pathexist(dir[:i],'directory')
+                if temp_dir != False:
                     if i == len(dir) - 1:
-                        if not temp.check_perm(2):
+                        if not temp_dir.check_perm(2):
                             print("mkdir: Permission denied")
                             break
-                    if not temp.check_perm(3):
+                    if not temp_dir.check_perm(3):
                         print("mkdir: Permission denied")
                         break
                 else:
-                    temp = self.pathexist(dir[:i-1])
-                    temp.add_directory(dir[i-1])
+                    temp_dir = self.pathexist(dir[:i-1],'directory')
+                    temp_dir.add_directory(dir[i-1])
                 i+=1
         else:
             dir = command[1].split("/")
@@ -171,10 +173,10 @@ class Namespace():
             if dis == False or dis.type == "file":
                 print("mv: No such file or directory")
             else:
-                source.parent.rm(source)
+                source.parent.child.remove(source)
                 source.parent = dis
                 source.name = path2[-1]
-                dis.child.add(source)
+                dis.child.append(source)
 
     def rm(self,command):
         path = command[1].split("/")
