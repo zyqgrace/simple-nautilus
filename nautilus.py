@@ -1,6 +1,7 @@
 class Namespace():
-    def __init__(self,name="/", parent=None, user="root"):
+    def __init__(self,name="/", parent=None, user="root", owner= "root"):
         self.user = user
+        self.owner = owner
         self.name = name
         self.pwd = self
         self.parent = parent
@@ -61,11 +62,13 @@ class Namespace():
         return cur
     
     def add_directory(self, filename):
-        dir = Namespace(filename, self,self.user)
+        owner = self.user
+        dir = Namespace(filename, self,self.user,owner)
         self.child.append(dir)
 
     def add_file(self, filename):
-        file = Namespace(filename, self, self.user)
+        owner = self.user
+        file = Namespace(filename, self, self.user,owner)
         file.type = "file"
         file.file_permission = "-rw-r--"
         self.child.append(file)
@@ -225,6 +228,7 @@ class Namespace():
         flag_d = False
         files = []
         cm_num = 1
+        pwd_name = None
         if "-l" in command:
             flag_l = True
             cm_num += 1
@@ -240,68 +244,62 @@ class Namespace():
                 return 
             else:
                 folder = self.pathexist(command[-1].split("/"))
+                if self.user != 'root':
+                    if self.user == folder.owner:
+                        if check_ancestor_perm(folder,3) == False:
+                            print("ls: Permission denied")
+                            return
+                    else:
+                        if check_ancestor_perm(folder,6) == False:
+                            print("ls: Permission denied")
+                            return
+                pwd_name = folder.name
         else:
             folder = self.pwd
-        for c in folder.child:
-            files.append(c)
+            pwd_name = "."
+        
         if flag_d:
-            for f in files:
-                if f.type == "directory":
-                    files.remove(f)
-        elif flag_l: 
-            if flag_a:
-                print(folder.file_permission + " " + folder.user + " .")
-                print(folder.parent.file_permission + " " + folder.parent.user + " ..")
-            for child in files:
-                print(child.file_permission + " " + child.user + " " +child.name)
+            if cm_num < len(command):
+                pwd_name = command[-1]
+            temp_file = [folder.file_permission, folder.owner, pwd_name]
+            files.append(temp_file)
         else:
             if flag_a:
-                print(".\n..")
+                temp_file = [folder.file_permission, folder.owner, "."]
+                files.append(temp_file)
+            for c in folder.child:
+                temp_file = [c.file_permission, c.owner, c.name]
+                files.append(temp_file)
+
+        if flag_l: 
             for child in files:
-                print(child.name)
+                print(child[0] + " " + child[1] + " " +child[2])
+        else:
+            for child in files:
+                print(child[2])
 
     def chmod(self,command):
-        file = self.pathexist(command[2].split("/"))
-        cur_perm = []
-        for perm in file.file_permission:
-            cur_perm.append(perm)
-        user = []
-        sign = None
-        perm = []
-        index = {
-            "u" : 1,
-            "o" : 4,
-            "r" : 0,
-            "w" : 1,
-            "x" : 2,
-        }
-        for char in command[1]:
-            if char in ["u","o","a"]:
-                if char == "a":
-                    user.append("u")
-                    user.append("o")
-                else:
-                    user.append(char)
-            elif char in ["+","=","-"]:
-                sign = char
-            elif char in ["r","x","w"]:
-                perm.append(char)
+        flag_r = False
+        if '-r' in command:
+            flag_r = True
 
-        for u in user:
-            if sign == "=":
-                i = 0
-                while i < 3:
-                    cur_perm[index[u]+i]="-"
-                    i+=1
-            for p in perm:
-                ind = index[u]+index[p]
-                if sign == "-":
-                    cur_perm[ind]="-"
-                else:
-                    cur_perm[ind]= p
-        file.file_permission = ""
-        for p in cur_perm:
-            file.file_permission += p
+        file = self.pathexist(command[-1].split("/"))
+
+        if flag_r:
+            all_files = file.recursive()
+            for c in all_files:
+                c.file_permission = change_mode(c.file_permission, command[-2])
+        else:
+            file.file_permission = change_mode(file.file_permission, command[-2])
+
+    def recursive(self):
+        result = []
+        i = 0
+        while i < len(self.child):
+            result += self.child
+            result += self.child[i].recursive()
+            i += 1
+        return result
 
     def chown(self,command,users):
         if self.user != "root":
@@ -328,6 +326,63 @@ class Namespace():
         if self.file_permission[ind] == dic[ind]:
             return True
         return False
+
+def change_mode(file_permission, mode):
+    cur_perm = []
+    for perm in file_permission:
+        cur_perm.append(perm)
+
+    user = []
+    sign = None
+    perm = []
+    index = {
+        "u" : 1,
+        "o" : 4,
+        "r" : 0,
+        "w" : 1,
+        "x" : 2,
+    }
+
+    for char in mode:
+
+        if char in ["u","o","a"]:
+            if char == "a":
+                user.append("u")
+                user.append("o")
+            else:
+                user.append(char)
+
+        elif char in ["+","=","-"]:
+            sign = char
+
+        elif char in ["r","x","w"]:
+            perm.append(char)
+
+    for u in user:
+        if sign == "=":
+            i = 0
+            while i < 3:
+                cur_perm[index[u]+i] = "-"
+                i+=1
+        for p in perm:
+            ind = index[u]+index[p]
+            if sign == "-":
+                cur_perm[ind] = "-"
+            else:
+                cur_perm[ind] = p
+
+    result = ''
+    for p in cur_perm:
+        result += p
+    return result
+
+def check_ancestor_perm(file, ind):
+    if file.check_perm(ind) == False:
+        return False
+    elif file.parent == None:
+        return True
+    else:
+        return check_ancestor_perm(file.parent, ind)
 
 def input_command(pwd):
     '''
@@ -428,7 +483,7 @@ def main():
             cur_user.rmdir(command)
         elif command[0] == 'ls':
             cur_user.ls(command)
-        elif command[0] == "chmod":
+        elif command[0] == "chmod" and 2 <= len(command) <= 4:
             cur_user.chmod(command)
         elif command[0]=="chown":
             cur_user.chown(command,users)
