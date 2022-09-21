@@ -150,7 +150,10 @@ class Namespace():
         elif source.type == "directory":
             print("cp: Source is a directory")
         else:
-            dis = self.pathexist(path2[:-1])
+            if len(path2)==1:
+                dis = self.pwd
+            else:
+                dis = self.pathexist(path2[:-1])
             if dis == False or dis.type == "file":
                 print("cp: No such file or directory")
             else:
@@ -238,6 +241,7 @@ class Namespace():
         if "-d" in command:
             flag_d = True
             cm_num += 1
+
         if cm_num < len(command):
             if self.pathexist(command[-1].split("/")) == False:
                 print("ls: No such file or directory")
@@ -258,18 +262,22 @@ class Namespace():
             folder = self.pwd
             pwd_name = "."
         
-        if flag_d:
-            if cm_num < len(command):
-                pwd_name = command[-1]
+        if folder.type == 'file':
             temp_file = [folder.file_permission, folder.owner, pwd_name]
             files.append(temp_file)
         else:
-            if flag_a:
-                temp_file = [folder.file_permission, folder.owner, "."]
+            if flag_d:
+                if cm_num < len(command):
+                    pwd_name = command[-1]
+                temp_file = [folder.file_permission, folder.owner, pwd_name]
                 files.append(temp_file)
-            for c in folder.child:
-                temp_file = [c.file_permission, c.owner, c.name]
-                files.append(temp_file)
+            else:
+                if flag_a:
+                    temp_file = [folder.file_permission, folder.owner, "."]
+                    files.append(temp_file)
+                for c in folder.child:
+                    temp_file = [c.file_permission, c.owner, c.name]
+                    files.append(temp_file)
 
         if flag_l: 
             for child in files:
@@ -286,19 +294,25 @@ class Namespace():
         file = self.pathexist(command[-1].split("/"))
 
         if flag_r:
-            all_files = file.recursive()
+            all_files = []
+            all_files.append(file)
+            all_files += file.recursive()
             for c in all_files:
-                c.file_permission = change_mode(c.file_permission, command[-2])
+                if self.user != 'root' and self.user != c.owner:
+                    print("chmod: Operation not permitted")
+                else:
+                    c.file_permission = change_mode(c.file_permission, command[-2])
         else:
             file.file_permission = change_mode(file.file_permission, command[-2])
 
     def recursive(self):
         result = []
-        i = 0
-        while i < len(self.child):
-            result += self.child
-            result += self.child[i].recursive()
-            i += 1
+        if len(self.child) == 0:
+            return []
+        result += self.child
+
+        for c in self.child:   
+            result += c.recursive()
         return result
 
     def chown(self,command,users):
@@ -384,14 +398,14 @@ def check_ancestor_perm(file, ind):
     else:
         return check_ancestor_perm(file.parent, ind)
 
-def input_command(pwd):
+def input_command(user, pwd):
     '''
     this function breaks the commandline input into a list of arguments 
     and boolean of validity
     '''
     valid = True
     quote = False
-    temp = input(pwd.user+":"+ str(pwd) +"$ ")
+    temp = input(user+":"+ str(pwd) +"$ ")
     valid_list = { "-", "_", "\"", " ", "+",\
          "=", ".", "/", "\t", "\n", "\r", "\v"}
 
@@ -433,7 +447,7 @@ def main():
     cur_user = root
     
     while True:
-        command_line = input_command(cur_user.pwd)
+        command_line = input_command(cur_user.user, cur_user.pwd)
         command = command_line[0]
         valid = command_line[1]
         all_commands = {'pwd', 'cd', 'exit', 'ls',"mkdir", "cp", "rm",\
