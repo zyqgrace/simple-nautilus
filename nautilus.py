@@ -153,7 +153,7 @@ class Namespace():
             print('cd: No such file or directory')
         elif  temp.type == 'file':
                 print("cd: Destination is a file")
-        elif not temp.check_perm('x'):
+        elif self.check_perm('x',temp) == False:
             print("cd: Permission denied")
         else:
             self.pwd = temp
@@ -163,6 +163,9 @@ class Namespace():
         path2 = command[2].split("/")
 
         source = self.pathexist(path)
+        if self.check_perm('r',source) == False:
+            print('cd: Permission denied')
+            return
         dis = self.pathexist(path2)
 
         if (dis !=False and dis.type == "file"):
@@ -274,13 +277,15 @@ class Namespace():
             folder = self.pwd
 
         if self.user != 'root':
-            if folder.check_perm('x') == False:
+            if folder.check_perm('r') == False:
                 print("ls: Permission denied")
                 return
-            if (not flag_d) and folder.parent.check_perm('x') == False:
+            if folder.parent == None:
+                pass
+            elif (not flag_d) and folder.parent.check_perm('r') == False:
                 print("ls: Permission denied")
                 return
-            if check_ancestor_perm(folder,6) == False:
+            if check_ancestor_perm(folder,'x') == False:
                 print("ls: Permission denied")
                 return
 
@@ -378,6 +383,8 @@ class Namespace():
                     f.owner = new_owner
 
     def check_perm(self,perm,file=None):
+        if self.user == 'root':
+            return True
         perms_ind = {
             'r': 1,
             'w': 2,
