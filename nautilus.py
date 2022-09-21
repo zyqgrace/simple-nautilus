@@ -328,16 +328,17 @@ class Namespace():
             new_owner = command[-2]
             if (new_owner not in users):
                     print("chown: Invalid user")
+                    return
             file = self.pathexist(command[-1].split("/"))
             files = []
             if file == False:
                 print("chown: No such file or directory")
                 return 
+
+            files.append(file)
             if '-r' in command:
-                files = file.recursive()
-            else:
-                files.append(file)
-    
+                    files += file.recursive()
+
             for f in files:
                     f.owner = new_owner
 
