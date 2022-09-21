@@ -301,9 +301,15 @@ class Namespace():
                 if self.user != 'root' and self.user != c.owner:
                     print("chmod: Operation not permitted")
                 else:
-                    c.file_permission = change_mode(c.file_permission, command[-2])
+                    if change_mode(c.file_permission, command[-2]) == False:
+                        print('chmod: Invalid mode')
+                    else:
+                        c.file_permission = change_mode(c.file_permission, command[-2])
         else:
-            file.file_permission = change_mode(file.file_permission, command[-2])
+            if change_mode(file.file_permission, command[-2]) == False:
+                print('chmod: Invalid mode')
+            else:
+                file.file_permission = print('chmod: Invalid mode')
 
     def recursive(self):
         result = []
@@ -357,20 +363,29 @@ def change_mode(file_permission, mode):
         "x" : 2,
     }
 
-    for char in mode:
-
-        if char in ["u","o","a"]:
-            if char == "a":
+    i = 0
+    while i < len(mode):
+        if mode[i] in ["u","o","a"]:
+            if mode[i] == "a":
                 user.append("u")
                 user.append("o")
             else:
-                user.append(char)
+                user.append(mode[i])
+            i += 1
+        else:
+            if mode[i] in ["+","=","-"]:
+                break
+            else:
+                return False
+    sign = mode[i]
+    i += 1
 
-        elif char in ["+","=","-"]:
-            sign = char
-
-        elif char in ["r","x","w"]:
-            perm.append(char)
+    while i < len(mode):
+        if mode[i] in ["r","x","w"]:
+            perm.append(mode[i])
+            i += 1
+        else:
+            return False
 
     for u in user:
         if sign == "=":
