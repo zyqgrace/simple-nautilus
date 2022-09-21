@@ -28,6 +28,15 @@ class Namespace():
             else:
                 self.user = command[1]
 
+    def adduser(self,command,users):
+        if self.user != 'root':
+            print('adduser: Operation not permitted')
+        elif command[1] in users:
+            print("adduser: The user already exists")
+        else:
+            users.append(command[1])
+        return users
+
     def pathexist(self, path, type=['directory', 'file']):
         if path == ["", ""]:
             return self
@@ -241,59 +250,75 @@ class Namespace():
                     i += 1
 
     def ls(self,command):
-        flag_l = False
-        flag_a = False
+        folders = []
+        flag_num = 0
         flag_d = False
-        files = []
-        cm_num = 1
-        pwd_name = None
+        flag_a = False
+        flag_l = False
         if "-l" in command:
+            flag_num += 1
             flag_l = True
-            cm_num += 1
         if "-a" in command:
+            flag_num += 1
             flag_a = True
-            cm_num += 1
         if "-d" in command:
+            flag_num += 1
             flag_d = True
-            cm_num += 1
 
-        if cm_num < len(command):
-            if self.pathexist(command[-1].split("/")) == False:
+        if (flag_num + 2) < len(command):
+            folder = self.pathexist(command[-1].split("/"))
+            if folder == False:
                 print("ls: No such file or directory")
-                return 
-            else:
-                folder = self.pathexist(command[-1].split("/"))
-                if self.user != 'root':
-                    if check_ancestor_perm(folder,'x') == False:
-                        print("ls: Permission denied")
-                        return
-                pwd_name = folder.name
+                return
         else:
             folder = self.pwd
-            pwd_name = "."
-        
+
+        if self.user != 'root':
+            if folder.check_perm(3) == False:
+                print("ls: Permission denied")
+                return
+            if (not flag_d) and folder.parent.check_perm(3) == False:
+                print("ls: Permission denied")
+                return
+            if check_ancestor_perm(folder,6) == False:
+                print("ls: Permission denied")
+                return
+
         if folder.type == 'file':
-            temp_file = [folder.file_permission, folder.owner, pwd_name]
-            files.append(temp_file)
+            temp_file = [folder.file_permission, folder.owner, command[-1]]
+            folders.append(temp_file)
         else:
             if flag_d:
-                if cm_num < len(command):
-                    pwd_name = command[-1]
-                temp_file = [folder.file_permission, folder.owner, pwd_name]
-                files.append(temp_file)
+                if flag_num + 2 < len(command):
+                    temp_file = [folder.file_permission, folder.owner, command[-1]]
+                else:
+                    temp_file = [folder.file_permission, folder.owner, '.']
+                folders.append(temp_file)
             else:
-                if flag_a:
-                    temp_file = [folder.file_permission, folder.owner, "."]
-                    files.append(temp_file)
+                temp_file = [folder.file_permission, folder.owner, "."]
+                folders.append(temp_file)
+                if folder.parent == None:
+                    temp_file = [folder.file_permission, folder.owner, ".."]
+                else:
+                    temp_file = [folder.parent.file_permission, folder.parent.owner, ".."]
+                folders.append(temp_file)
                 for c in folder.child:
                     temp_file = [c.file_permission, c.owner, c.name]
-                    files.append(temp_file)
+                    folders.append(temp_file)
+
+                if not flag_a:
+                    i = 0
+                    while i < len(folders):
+                        if folders[i][2][0] == '.':
+                            folders.pop(i)
+                        else:
+                            i += 1
 
         if flag_l: 
-            for child in files:
+            for child in folders:
                 print(child[0] + " " + child[1] + " " +child[2])
         else:
-            for child in files:
+            for child in folders:
                 print(child[2])
 
     def chmod(self,command):
@@ -497,10 +522,7 @@ def main():
         elif command[0] == "su":
             cur_user.su(command,users)
         elif command[0] == "adduser":
-            if command[1] in users:
-                print("adduser: The user already exists")
-            else:
-                users.append(command[1])
+            users = cur_user.adduser(command,users)
         elif command[0] == "deluser":
             unwant_user = command[1]
             if not(unwant_user in users):

@@ -23,21 +23,6 @@ def check_perm(self,perm,file=None):
             ind += 3
         return file.file_permission[ind] == perm
 
-def check_perm(self, perm):
-        if self.o
-        dic = {
-            'd': 0,
-            1: 'r',
-            2: 'w',
-            3: 'x',
-            4: 'r',
-            5: 'w',
-            6: 'x'
-        }
-        if self.file_permission[ind] == dic[ind]:
-            return True
-        return False
-
 def ls(self,command):
 
     folders = []
@@ -61,10 +46,8 @@ def ls(self,command):
         if folder == False:
             print("ls: No such file or directory")
             return
-        pwd_name = folder.name
     else:
         folder = self.pwd
-        pwd_name = '.'
     
     if self.user != 'root':
         if folder.check_perm(3) == False:
@@ -78,21 +61,27 @@ def ls(self,command):
             return
 
     if folder.type == 'file':
-        temp_file = [folder.file_permission, folder.owner, pwd_name]
+        temp_file = [folder.file_permission, folder.owner, command[-1]]
         folders.append(temp_file)
     else:
         if flag_d:
             if flag_num < len(command):
-                pwd_name = command[-1]
-            temp_file = [folder.file_permission, folder.owner, pwd_name]
+                temp_file = [folder.file_permission, folder.owner, command[-1]]
+            else:
+                temp_file = [folder.file_permission, folder.owner, '.']
             folders.append(temp_file)
         else:
-            if flag_a:
-                temp_file = [folder.file_permission, folder.owner, "."]
-                folders.append(temp_file)
+            temp_file = [folder.file_permission, folder.owner, "."]
+            folders.append(temp_file)
+            temp_file = [folder.parent.file_permission, folder.parent.owner, ".."]
+            folders.append(temp_file)
             for c in folder.child:
                 temp_file = [c.file_permission, c.owner, c.name]
                 folders.append(temp_file)
+            if not flag_a:
+                for f in folders:
+                    if f[0] == '.':
+                        folders.remove(f)
 
     if flag_l: 
         for child in folders:
