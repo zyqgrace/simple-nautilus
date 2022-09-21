@@ -75,14 +75,26 @@ class Namespace():
 
     def touch(self,command):
         file = command[1].split("/")
-        if len(file)==1:
-            self.pwd.add_file(file[0])
+        if len(file) == 1:
+            dir = self.pwd
+            filename = file[0]
         else:
-            temp = self.pathexist(file[:-1])
-            if temp != False:
-                temp.add_file(file[-1])
-            else:
+            dir = self.pathexist(file[:-1])
+            filename = file[-1]
+            if dir == False:
                 print("touch: Ancestor directory does not exist")
+                return
+        if self.user != 'root':
+            if check_ancestor_perm(dir, 6) == False:
+                print('touch: Permission denied')
+            if dir.parent != None:
+                if dir.parent.check_perm(5) == False:
+                    print('touch: Permission denied')
+
+        if self.pathexist(file) != False:
+            return
+        dir.add_file(filename)
+        
 
     def mkdir(self,command):
         if len(command) == 3 and command[1]!= "-p":
