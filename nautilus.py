@@ -85,10 +85,13 @@ class Namespace():
                 print("touch: Ancestor directory does not exist")
                 return
         if self.user != 'root':
-            if check_ancestor_perm(dir, 6) == False:
+            if check_ancestor_perm(dir, 'x') == False:
                 print('touch: Permission denied')
             if dir.parent != None:
-                if dir.parent.check_perm(5) == False:
+                if dir.parent.check_perm('w') == False:
+                    print('touch: Permission denied')
+            else:
+                if dir.check_perm('w') == False:
                     print('touch: Permission denied')
 
         if self.pathexist(file) != False:
@@ -110,10 +113,10 @@ class Namespace():
                 temp_dir = self.pathexist(dir[:i],'directory')
                 if temp_dir != False:
                     if i == len(dir) - 1:
-                        if not temp_dir.check_perm(2):
+                        if not temp_dir.check_perm('r'):
                             print("mkdir: Permission denied")
                             break
-                    if not temp_dir.check_perm(3):
+                    if not temp_dir.check_perm('w'):
                         print("mkdir: Permission denied")
                         break
                 else:
@@ -139,9 +142,9 @@ class Namespace():
         temp = self.pathexist(path)
         if temp == False:
             print('cd: No such file or directory')
-        elif not temp.check_perm(0):
+        elif  temp.type == 'file':
                 print("cd: Destination is a file")
-        elif not temp.check_perm(3):
+        elif not temp.check_perm('w'):
             print("cd: Permission denied")
         else:
             self.pwd = temp
@@ -354,19 +357,21 @@ class Namespace():
             for f in files:
                     f.owner = new_owner
 
-    def check_perm(self, ind):
-        dic = {
-            0: 'd',
-            1: 'r',
-            2: 'w',
-            3: 'x',
-            4: 'r',
-            5: 'w',
-            6: 'x'
+    def check_perm(self,perm,file=None):
+        perms_ind = {
+            'r': 1,
+            'w': 2,
+            'x': 3,
         }
-        if self.file_permission[ind] == dic[ind]:
-            return True
-        return False
+        ind = perms_ind[perm]
+        if file == None:
+            if self.user != self.owner:
+                ind += 3
+            return self.file_permission[ind] == perm
+        else:
+            if self.user != file.owner:
+                ind += 3
+            return file.file_permission[ind] == perm
 
 def change_mode(file_permission, mode):
     cur_perm = []

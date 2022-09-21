@@ -7,9 +7,26 @@ def check_ancestor_perm(file, ind):
     else:
         return check_ancestor_perm(file.parent, ind)
 
-def check_perm(self, ind):
+def check_perm(self,perm,file=None):
+    perms_ind = {
+        'r': 1,
+        'w': 2,
+        'x': 3,
+    }
+    ind = perms_ind[perm]
+    if file == None:
+        if self.user != self.owner:
+            ind += 3
+        return self.file_permission[ind] == perm
+    else:
+        if self.user != file.owner:
+            ind += 3
+        return file.file_permission[ind] == perm
+
+def check_perm(self, perm):
+        if self.o
         dic = {
-            0: 'd',
+            'd': 0,
             1: 'r',
             2: 'w',
             3: 'x',
