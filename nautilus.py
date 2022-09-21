@@ -325,6 +325,9 @@ class Namespace():
         if self.user != "root":
             print("chown: Operation not permitted")
         else:
+            new_owner = command[-2]
+            if (new_owner not in users):
+                    print("chown: Invalid user")
             file = self.pathexist(command[-1].split("/"))
             files = []
             if file == False:
@@ -334,13 +337,8 @@ class Namespace():
                 files = file.recursive()
             else:
                 files.append(file)
-            
-            new_owner = command[-2]
-
+    
             for f in files:
-                if (new_owner not in users):
-                    print("chown: Invalid user")
-                else:
                     f.owner = new_owner
 
     def check_perm(self, ind):
