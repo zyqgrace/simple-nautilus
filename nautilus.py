@@ -309,7 +309,7 @@ class Namespace():
             if change_mode(file.file_permission, command[-2]) == False:
                 print('chmod: Invalid mode')
             else:
-                file.file_permission = print('chmod: Invalid mode')
+                file.file_permission = change_mode(file.file_permission, command[-2])
 
     def recursive(self):
         result = []
