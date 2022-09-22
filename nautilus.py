@@ -246,6 +246,9 @@ class Namespace():
         elif file.type == "directory":
             print("rm: Is a directory")
         else:
+            if file.perm_check(True, 'w', True, 'w', True, 'x', self.user):
+                print('rm: Permission denied')
+                return
             parent = file.parent
             i = 0
             while i < len(parent.child):
@@ -266,6 +269,9 @@ class Namespace():
         elif len(dir.child) > 0:
             print("rmdir: Directory not empty")
         else:
+            if dir.perm_check(False, '', True, 'w', True, 'x', self.user):
+                print('rmdir: Permission denied')
+                return
             parent = dir.parent
             if parent == None:
                 for c in self.child:
