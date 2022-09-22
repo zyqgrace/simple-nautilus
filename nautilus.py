@@ -94,13 +94,13 @@ class Namespace():
                 print("touch: Ancestor directory does not exist")
                 return
         if self.user != 'root':
-            if check_ancestor_perm(dir, 'x') == False:
+            if check_ancestor_perm(dir, 'x',self.user) == False:
                 print('touch: Permission denied')
             if dir.parent != None:
-                if dir.parent.check_perm('w') == False:
+                if dir.parent.check_perm('w',self.user) == False:
                     print('touch: Permission denied')
             else:
-                if dir.check_perm('w') == False:
+                if dir.check_perm('w',self.user) == False:
                     print('touch: Permission denied')
 
         if self.pathexist(file) != False:
@@ -122,10 +122,10 @@ class Namespace():
                 temp_dir = self.pathexist(dir[:i],'directory')
                 if temp_dir != False:
                     if i == len(dir) - 1:
-                        if not temp_dir.check_perm('r'):
+                        if not temp_dir.check_perm('r',self.user):
                             print("mkdir: Permission denied")
                             break
-                    if not temp_dir.check_perm('w'):
+                    if not temp_dir.check_perm('w',self.user):
                         print("mkdir: Permission denied")
                         break
                 else:
@@ -153,7 +153,7 @@ class Namespace():
             print('cd: No such file or directory')
         elif  temp.type == 'file':
                 print("cd: Destination is a file")
-        elif self.check_perm('x',temp) == False:
+        elif self.check_perm('x', self.user, temp) == False:
             print("cd: Permission denied")
         else:
             self.pwd = temp
@@ -163,10 +163,17 @@ class Namespace():
         path2 = command[2].split("/")
 
         source = self.pathexist(path)
-        if self.check_perm('r',source) == False:
-            print('cd: Permission denied')
+        if source.check_perm('r', self.user) == False:
+            print('cp: Permission denied')
             return
+        elif check_ancestor_perm(source,'x',self.user) == False:
+            print('cp: Permission denied')
+            return
+
         dis = self.pathexist(path2)
+        if check_ancestor_perm(dis,'x',self.user) == False:
+            print('cp: Permission denied')
+            return
 
         if (dis !=False and dis.type == "file"):
             print("cp: File exists")
@@ -184,6 +191,9 @@ class Namespace():
             if dis == False or dis.type == "file":
                 print("cp: No such file or directory")
             else:
+                if dis.check_perm('w',self.user) == False:
+                    print("cp: Source is a directory")
+                    return
                 dis.add_file(path2[-1])
 
     def mv(self,command):
@@ -277,15 +287,15 @@ class Namespace():
             folder = self.pwd
 
         if self.user != 'root':
-            if folder.check_perm('r') == False:
+            if folder.check_perm('r',self.user) == False:
                 print("ls: Permission denied")
                 return
             if folder.parent == None:
                 pass
-            elif (not flag_d) and folder.parent.check_perm('r') == False:
+            elif (not flag_d) and folder.parent.check_perm('r',self.user) == False:
                 print("ls: Permission denied")
                 return
-            if check_ancestor_perm(folder,'x') == False:
+            if check_ancestor_perm(folder,'x',self.user) == False:
                 print("ls: Permission denied")
                 return
 
@@ -333,7 +343,7 @@ class Namespace():
 
         file = self.pathexist(command[-1].split("/"))
 
-        if check_ancestor_perm(file,'x') == False:
+        if check_ancestor_perm(file,'x',self.user) == False:
             print("chmod: Operation not permitted")
             return
             
@@ -386,8 +396,8 @@ class Namespace():
             for f in files:
                     f.owner = new_owner
 
-    def check_perm(self,perm,file=None):
-        if self.user == 'root':
+    def check_perm(self, perm, user, file=None):
+        if user == 'root':
             return True
         perms_ind = {
             'r': 1,
@@ -396,11 +406,11 @@ class Namespace():
         }
         ind = perms_ind[perm]
         if file == None:
-            if self.user != self.owner:
+            if user != self.owner:
                 ind += 3
             return self.file_permission[ind] == perm
         else:
-            if self.user != file.owner:
+            if user != file.owner:
                 ind += 3
             return file.file_permission[ind] == perm
 
@@ -462,13 +472,13 @@ def change_mode(file_permission, mode):
         result += p
     return result
 
-def check_ancestor_perm(file, ind):
-    if file.check_perm(ind) == False:
+def check_ancestor_perm(file, ind, user):
+    if file.check_perm(ind,user) == False:
         return False
     elif file.parent == None:
         return True
     else:
-        return check_ancestor_perm(file.parent, ind)
+        return check_ancestor_perm(file.parent, ind, user)
 
 def input_command(user, pwd):
     '''
