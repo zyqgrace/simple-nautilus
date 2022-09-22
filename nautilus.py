@@ -84,6 +84,7 @@ class Namespace():
 
     def touch(self,command):
         file = command[1].split("/")
+
         if len(file) == 1:
             dir = self.pwd
             filename = file[0]
@@ -149,7 +150,7 @@ class Namespace():
         if temp == False:
             print('cd: No such file or directory')
         elif  temp.type == 'file':
-                print("cd: Destination is a file")
+            print("cd: Destination is a file")
         elif self.perm('x', self.user, temp) == False:
             print("cd: Permission denied")
         else:
@@ -205,25 +206,36 @@ class Namespace():
 
         if (dis !=False and dis.type == "file"):
             print("mv: File exists")
+            return
         elif source == False:
             print("mv: No such file")
+            return
         elif (dis !=False and dis.type == "directory"):
             print("mv: Destination is a directory")
+            return
         elif source.type == "directory":
             print("mv: Source is a directory")
+            return
+        
+        if len(path2) == 1:
+            dis = self.pwd
         else:
-            if len(path2) == 1:
-                dis = self.pwd
-            else:
-                dis = self.pathexist(path2[:-1])
+            dis = self.pathexist(path2[:-1])
 
-            if dis == False or dis.type == "file":
-                print("mv: No such file or directory")
-            else:
-                source.parent.child.remove(source)
-                source.parent = dis
-                source.name = path2[-1]
-                dis.child.append(source)
+        if source.perm_check(False,'',True,'w',True,'x',self.user):
+            print("mv: Permission denied")
+            return
+        elif dis.perm_check(True, 'w', False, '', True, 'x', self.user):
+            print("mv: Permission denied")
+            return
+            
+        if dis == False or dis.type == "file":
+            print("mv: No such file or directory")
+        else:
+            source.parent.child.remove(source)
+            source.parent = dis
+            source.name = path2[-1]
+            dis.child.append(source)
 
     def rm(self,command):
         path = command[1].split("/")
