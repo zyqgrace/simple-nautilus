@@ -291,7 +291,11 @@ class Namespace():
             folder = self.pwd
 
         if ('-d' in command) or folder.type == 'file':
-            if folder.parent.check_perm('r',self.user) == False:
+            if folder.parent == None:
+                if folder.perm('r',self.user) == False:
+                    print("ls: Permission denied")
+                    return
+            elif folder.parent.perm('r',self.user) == False:
                 print("ls: Permission denied")
                 return
         elif folder.type == 'directory':
@@ -428,7 +432,9 @@ class Namespace():
             if self.perm(perm1,user) == False:
                 denied = True
         if par:
-            if self.parent.perm(perm2,user) == False:
+            if self.parent == None:
+                pass
+            elif self.parent.perm(perm2,user) == False:
                 denied = True
         if ance:
             if check_ancestor_perm(self, perm3,user) == False:
