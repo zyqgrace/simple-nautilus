@@ -329,13 +329,17 @@ class Namespace():
                     temp_file = [c.file_permission, c.owner, c.name]
                     folders.append(temp_file)
 
-        if not('-a' in command):
-            i = 0
-            while i < len(folders):
-                if folders[i][2][0] == '.':
-                    folders.pop(i)
-                else:
-                    i += 1
+        i = 0
+        hidden_files = []
+        while i < len(folders):
+            if folders[i][2][0] == '.':
+                hidden_files.append(folders[i])
+                folders.pop(i)
+            else:
+                i += 1
+
+        if '-a' in command:
+            folders = hidden_files + folders
 
         if '-l' in command: 
             for child in folders:
