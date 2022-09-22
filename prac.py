@@ -1,47 +1,68 @@
-def cp(self,command):
-    path = command[1].split("/")
-    path2 = command[2].split("/")
+    def ls(self,command):
+        folders = []
+        flag_num = 0
 
-    source = self.pathexist(path)
-    copy_file = self.pathexist(path2)
+        if "-l" in command:
+            flag_num += 1
+        if "-a" in command:
+            flag_num += 1
+        if "-d" in command:
+            flag_num += 1
 
-    if len(path2)==1:
-        dis_dir = self.pwd
-    else:
-        dis_dir = self.pathexist(path2[:-1])
-    
-    if source == False:
-        print("cp: No such file")
-        return
+        if (flag_num + 1) < len(command):
+            folder = self.pathexist(command[-1].split("/"))
+            if folder == False:
+                print("ls: No such file or directory")
+                return
+        else:
+            folder = self.pwd
 
-    if dis_dir == False:
-        print("cp: No such file or directory")
-        return
 
-    if (dir !=False):
+        if folder.check_perm('r',self.user) == False:
+            print("ls: Permission denied")
+            return
+        if folder.parent == None:
+            pass
+        if not('-d' in command) and folder.parent.check_perm('r',self.user) == False:
+            print("ls: Permission denied")
+            return
+        if check_ancestor_perm(folder,'x',self.user) == False:
+            print("ls: Permission denied")
+            return
 
-        if  dir.name == path[-1]:
-            print("cp: File exists")
-            return 
+        if folder.type == 'file':
+            temp_file = [folder.file_permission, folder.owner, command[-1]]
+            folders.append(temp_file)
+        else:
+            if flag_d:
+                if flag_num + 1 < len(command):
+                    temp_file = [folder.file_permission, folder.owner, command[-1]]
+                else:
+                    temp_file = [folder.file_permission, folder.owner, '.']
+                folders.append(temp_file)
+            else:
+                temp_file = [folder.file_permission, folder.owner, "."]
+                folders.append(temp_file)
+                if folder.parent == None:
+                    temp_file = [folder.file_permission, folder.owner, ".."]
+                else:
+                    temp_file = [folder.parent.file_permission, folder.parent.owner, ".."]
+                folders.append(temp_file)
+                for c in folder.child:
+                    temp_file = [c.file_permission, c.owner, c.name]
+                    folders.append(temp_file)
 
-        elif dir.type == 'directory':
-            print("cp: Source is a directory")
-            return 
+        if not flag_a:
+            i = 0
+            while i < len(folders):
+                if folders[i][2][0] == '.':
+                    folders.pop(i)
+                else:
+                    i += 1
 
-    if source.check_perm('r', self.user) == False:
-        print('cp: Permission denied')
-        return
-
-    elif check_ancestor_perm(source,'x',self.user) == False:
-        print('cp: Permission denied')
-        return
-
-    if dis_dir.check_perm('w', self.user) == False:
-        print('cp: Permission denied')
-        return
-
-    if check_ancestor_perm(dis_dir,'x',self.user) == False:
-        print('cp: Permission denied')
-        return
-
-    dis_dir.add_file(path2[-1])
+        if flag_l: 
+            for child in folders:
+                print(child[0] + " " + child[1] + " " +child[2])
+        else:
+            for child in folders:
+                print(child[2])

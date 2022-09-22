@@ -278,18 +278,13 @@ class Namespace():
     def ls(self,command):
         folders = []
         flag_num = 0
-        flag_d = False
-        flag_a = False
-        flag_l = False
+
         if "-l" in command:
             flag_num += 1
-            flag_l = True
         if "-a" in command:
             flag_num += 1
-            flag_a = True
         if "-d" in command:
             flag_num += 1
-            flag_d = True
 
         if (flag_num + 1) < len(command):
             folder = self.pathexist(command[-1].split("/"))
@@ -299,24 +294,24 @@ class Namespace():
         else:
             folder = self.pwd
 
-        if self.user != 'root':
-            if folder.check_perm('r',self.user) == False:
-                print("ls: Permission denied")
-                return
-            if folder.parent == None:
-                pass
-            elif (not flag_d) and folder.parent.check_perm('r',self.user) == False:
-                print("ls: Permission denied")
-                return
-            if check_ancestor_perm(folder,'x',self.user) == False:
-                print("ls: Permission denied")
-                return
+
+        if folder.check_perm('r',self.user) == False:
+            print("ls: Permission denied")
+            return
+        if folder.parent == None:
+            pass
+        if not('-d' in command) and folder.parent.check_perm('r',self.user) == False:
+            print("ls: Permission denied")
+            return
+        if check_ancestor_perm(folder,'x',self.user) == False:
+            print("ls: Permission denied")
+            return
 
         if folder.type == 'file':
             temp_file = [folder.file_permission, folder.owner, command[-1]]
             folders.append(temp_file)
         else:
-            if flag_d:
+            if '-d' in command:
                 if flag_num + 1 < len(command):
                     temp_file = [folder.file_permission, folder.owner, command[-1]]
                 else:
@@ -334,15 +329,15 @@ class Namespace():
                     temp_file = [c.file_permission, c.owner, c.name]
                     folders.append(temp_file)
 
-                if not flag_a:
-                    i = 0
-                    while i < len(folders):
-                        if folders[i][2][0] == '.':
-                            folders.pop(i)
-                        else:
-                            i += 1
+        if not('-a' in command):
+            i = 0
+            while i < len(folders):
+                if folders[i][2][0] == '.':
+                    folders.pop(i)
+                else:
+                    i += 1
 
-        if flag_l: 
+        if '-l' in command: 
             for child in folders:
                 print(child[0] + " " + child[1] + " " +child[2])
         else:
