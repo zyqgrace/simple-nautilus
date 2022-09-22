@@ -163,44 +163,50 @@ class Namespace():
         path2 = command[2].split("/")
 
         source = self.pathexist(path)
+        copy_file = self.pathexist(path2)
+
+        if len(path2)==1:
+            dis_dir = self.pwd
+        else:
+            dis_dir = self.pathexist(path2[:-1])
+
+        if (copy_file != False):
+            if  copy_file.name == path[-1]:
+                print("cp: File exists")
+                return
+            elif copy_file.type == 'directory':
+                print('cp: Destination is a directory')
+                return
+        if source == False:
+            print("cp: No such file")
+            return
+        if dis_dir == False:
+            print("cp: No such file or directory")
+            return
+        if source.type == 'directory':
+            print("cp: Source is a directory")
+            return
+                
         if source.check_perm('r', self.user) == False:
             print('cp: Permission denied')
             return
-        elif check_ancestor_perm(source,'x',self.user) == False:
+        if check_ancestor_perm(source,'x',self.user) == False:
+            print('cp: Permission denied')
+            return
+        if dis_dir.check_perm('w', self.user) == False:
+            print('cp: Permission denied')
+            return
+        if check_ancestor_perm(dis_dir,'x',self.user) == False:
             print('cp: Permission denied')
             return
 
-        dis = self.pathexist(path2)
-        if check_ancestor_perm(dis,'x',self.user) == False:
-            print('cp: Permission denied')
-            return
-
-        if (dis !=False and dis.type == "file"):
-            print("cp: File exists")
-        elif source == False:
-            print("cp: No such file")
-        elif (dis != False and dis.type == "directory"):
-            print("cp: Destination is a directory")
-        elif source.type == "directory":
-            print("cp: Source is a directory")
-        else:
-            if len(path2)==1:
-                dis = self.pwd
-            else:
-                dis = self.pathexist(path2[:-1])
-            if dis == False or dis.type == "file":
-                print("cp: No such file or directory")
-            else:
-                if dis.check_perm('w',self.user) == False:
-                    print("cp: Source is a directory")
-                    return
-                dis.add_file(path2[-1])
+        dis_dir.add_file(path2[-1])
 
     def mv(self,command):
         path = command[1].split("/")
-        path2 = command[2].split("/")
-
         source = self.pathexist(path)
+
+        path2 = command[2].split("/")
         dis = self.pathexist(path2)
 
         if (dis !=False and dis.type == "file"):
@@ -212,7 +218,11 @@ class Namespace():
         elif source.type == "directory":
             print("mv: Source is a directory")
         else:
-            dis = self.pathexist(path2[:-1])
+            if len(path2) == 1:
+                dis = self.pwd
+            else:
+                dis = self.pathexist(path2[:-1])
+
             if dis == False or dis.type == "file":
                 print("mv: No such file or directory")
             else:
@@ -344,7 +354,7 @@ class Namespace():
         file = self.pathexist(command[-1].split("/"))
 
         if check_ancestor_perm(file,'x',self.user) == False:
-            print("chmod: Operation not permitted")
+            print("chmod: Permission denied")
             return
             
         if flag_r:
