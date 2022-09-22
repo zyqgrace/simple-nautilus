@@ -333,6 +333,10 @@ class Namespace():
 
         file = self.pathexist(command[-1].split("/"))
 
+        if check_ancestor_perm(file,'x') == False:
+            print("chmod: Operation not permitted")
+            return
+            
         if flag_r:
             all_files = []
             all_files.append(file)
@@ -532,6 +536,8 @@ def main():
             users = cur_user.adduser(command,users)
         elif command[0] == "deluser":
             unwant_user = command[1]
+            if cur_user.user != 'root':
+                print('deluser: Operation not permitted')
             if not(unwant_user in users):
                 print("deluser: The user does not exist")
             elif unwant_user == "root":
