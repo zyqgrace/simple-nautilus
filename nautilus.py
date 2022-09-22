@@ -93,15 +93,10 @@ class Namespace():
             if dir == False:
                 print("touch: Ancestor directory does not exist")
                 return
-        if self.user != 'root':
-            if check_ancestor_perm(dir, 'x',self.user) == False:
-                print('touch: Permission denied')
-            if dir.parent != None:
-                if dir.parent.perm('w',self.user) == False:
-                    print('touch: Permission denied')
-            else:
-                if dir.perm('w',self.user) == False:
-                    print('touch: Permission denied')
+        
+        if dir.perm_check(True,'w',False,'',True,'x'):
+            print('touch: Permission denied')
+            return
 
         if self.pathexist(file) != False:
             return
