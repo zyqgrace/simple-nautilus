@@ -133,14 +133,16 @@ class Namespace():
         else:
             if self.pathexist(dir) != False:
                 print("mkdir: File exists")
+                return
             
-            
-            elif len(dir)==1:
-                self.pwd.add_directory(dir[0])
-
-            elif self.pathexist(dir[:-1]) != False:
-                temp = self.pathexist(dir[:-1])
-                temp.add_directory(dir[-1])
+            if len(dir)==1:
+                parent_dir = self.pwd
+            else:
+                parent_dir = self.pathexist(dir[:-1])
+            if  parent_dir != False:
+                if parent_dir.perm_check(True,'w',False,'',True,'x',self.user):
+                    print('mkdir: Permission denied')
+                parent_dir.add_directory(dir[-1])
             else:
                 print("mkdir: Ancestor directory does not exist")
     
@@ -216,11 +218,13 @@ class Namespace():
         elif source.type == "directory":
             print("mv: Source is a directory")
             return
-        
         if len(path2) == 1:
             dis = self.pwd
         else:
             dis = self.pathexist(path2[:-1])
+        if dis == False or dis.type == "file":
+            print("mv: No such file or directory")
+            return 
 
         if source.perm_check(False,'',True,'w',True,'x',self.user):
             print("mv: Permission denied")
@@ -228,14 +232,11 @@ class Namespace():
         elif dis.perm_check(True, 'w', False, '', True, 'x', self.user):
             print("mv: Permission denied")
             return
-            
-        if dis == False or dis.type == "file":
-            print("mv: No such file or directory")
-        else:
-            source.parent.child.remove(source)
-            source.parent = dis
-            source.name = path2[-1]
-            dis.child.append(source)
+
+        source.parent.child.remove(source)
+        source.parent = dis
+        source.name = path2[-1]
+        dis.child.append(source)
 
     def rm(self,command):
         path = command[1].split("/")
