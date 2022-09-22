@@ -300,7 +300,7 @@ class Namespace():
             return
         if folder.parent == None:
             pass
-        if not('-d' in command) and folder.parent.check_perm('r',self.user) == False:
+        elif not('-d' in command) and folder.parent.check_perm('r',self.user) == False:
             print("ls: Permission denied")
             return
         if check_ancestor_perm(folder,'x',self.user) == False:

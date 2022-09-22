@@ -34,7 +34,7 @@
             temp_file = [folder.file_permission, folder.owner, command[-1]]
             folders.append(temp_file)
         else:
-            if flag_d:
+            if '-d' in command:
                 if flag_num + 1 < len(command):
                     temp_file = [folder.file_permission, folder.owner, command[-1]]
                 else:
@@ -52,7 +52,7 @@
                     temp_file = [c.file_permission, c.owner, c.name]
                     folders.append(temp_file)
 
-        if not flag_a:
+        if not('-a' in command):
             i = 0
             while i < len(folders):
                 if folders[i][2][0] == '.':
@@ -60,7 +60,7 @@
                 else:
                     i += 1
 
-        if flag_l: 
+        if '-l' in command: 
             for child in folders:
                 print(child[0] + " " + child[1] + " " +child[2])
         else:
