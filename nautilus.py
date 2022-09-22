@@ -171,7 +171,7 @@ class Namespace():
             dis_dir = self.pathexist(path2[:-1])
 
         if (copy_file != False):
-            if  copy_file.name == path[-1]:
+            if  copy_file.name == path2[-1]:
                 print("cp: File exists")
                 return
             elif copy_file.type == 'directory':
@@ -181,6 +181,9 @@ class Namespace():
             print("cp: No such file")
             return
         if dis_dir == False:
+            print("cp: No such file or directory")
+            return
+        if dis_dir.type == 'file':
             print("cp: No such file or directory")
             return
         if source.type == 'directory':
