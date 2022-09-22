@@ -94,7 +94,7 @@ class Namespace():
                 print("touch: Ancestor directory does not exist")
                 return
         
-        if dir.perm_check(True,'w',False,'',True,'x'):
+        if dir.perm_check(True,'w',False,'',True,'x',self.user):
             print('touch: Permission denied')
             return
 
