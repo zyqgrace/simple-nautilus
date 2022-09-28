@@ -1,0 +1,14 @@
+root:/$ 
+root:/$ 
+user:/$ 
+user:/$ 
+user:/$ 
+user:/$ touch: Permission denied
+root:/$ 
+root:/$ 
+root:/$ -rw-r-- root allow
+root:/$ 
+root:/$ 
+user:/$ 
+user:/$ 
+user:/$ -rw-r-- user f

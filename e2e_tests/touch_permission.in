@@ -1,0 +1,14 @@
+adduser user
+chmod o+w /
+su user
+mkdir no_x
+chmod u-x no_x
+touch no_x/not_allow
+su
+touch no_x/allow
+ls -l no_x
+mkdir -p a/b/c/d/e
+chmod o+w a/b/c/d/e
+su user
+touch a/b/c/d/e/f
+ls -l a/b/c/d/e

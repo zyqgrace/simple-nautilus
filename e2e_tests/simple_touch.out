@@ -1,0 +1,9 @@
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ drwxr-x root folder1 -rw-r-- root a -rw-r-- root b -rw-r-- root c -rw-r-- root d
+root:/$ touch: Ancestor directory does not exist
+root:/$ -rw-r-- root e

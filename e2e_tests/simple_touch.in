@@ -1,0 +1,9 @@
+mkdir folder1
+touch a
+touch ./b
+touch /c
+touch ../d
+touch folder1/e
+ls -l
+touch folder2/f
+ls -l folder1
