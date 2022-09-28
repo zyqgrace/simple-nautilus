@@ -156,15 +156,12 @@ class Namespace():
     def cp(self,command):
         path = command[1].split("/")
         path2 = command[2].split("/")
-
         source = self.pathexist(path)
         copy_file = self.pathexist(path2)
-
         if len(path2)==1:
             dis_dir = self.pwd
         else:
             dis_dir = self.pathexist(path2[:-1])
-
         if (copy_file != False):
             if copy_file.type == 'directory':
                 print('cp: Destination is a directory')
@@ -184,23 +181,21 @@ class Namespace():
         if source.type == 'directory':
             print("cp: Source is a directory")
             return
-                
-        if source.perm_check(True, 'r', False,'', True, 'x', self.user):
+        if source.perm_check(True, 'r', False,'',
+        True, 'x', self.user):
             print('cp: Permission denied')
             return
-        if dis_dir.perm_check(True, 'w', False,'', True, 'x', self.user):
+        if dis_dir.perm_check(True, 'w', False,'',
+        True, 'x', self.user):
             print('cp: Permission denied')
             return
-
         dis_dir.add_file(path2[-1],self.user)
 
     def mv(self,command):
         path = command[1].split("/")
         source = self.pathexist(path)
-
         path2 = command[2].split("/")
         dis = self.pathexist(path2)
-
         if (dis !=False and dis.type == "file"):
             print("mv: File exists")
             return
@@ -220,14 +215,14 @@ class Namespace():
         if dis == False or dis.type == "file":
             print("mv: No such file or directory")
             return 
-
-        if source.perm_check(False,'',True,'w',True,'x',self.user):
+        if source.perm_check(False,'',True,'w',
+        True,'x',self.user):
             print("mv: Permission denied")
             return
-        elif dis.perm_check(True, 'w', False, '', True, 'x', self.user):
+        elif dis.perm_check(True, 'w', False, '',
+        True, 'x', self.user):
             print("mv: Permission denied")
             return
-
         source.parent.child.remove(source)
         source.parent = dis
         source.name = path2[-1]
@@ -241,7 +236,8 @@ class Namespace():
         elif file.type == "directory":
             print("rm: Is a directory")
         else:
-            if file.perm_check(True, 'w', True, 'w', True, 'x', self.user):
+            if file.perm_check(True, 'w', True, 'w',
+            True, 'x', self.user):
                 print('rm: Permission denied')
                 return
             parent = file.parent
@@ -264,7 +260,8 @@ class Namespace():
         elif len(dir.child) > 0:
             print("rmdir: Directory not empty")
         else:
-            if dir.perm_check(False, '', True, 'w', True, 'x', self.user):
+            if dir.perm_check(False, '', True, 'w',
+            True, 'x', self.user):
                 print('rmdir: Permission denied')
                 return
             parent = dir.parent
@@ -283,14 +280,12 @@ class Namespace():
     def ls(self,command):
         folders = []
         flag_num = 0
-
         if "-l" in command:
             flag_num += 1
         if "-a" in command:
             flag_num += 1
         if "-d" in command:
             flag_num += 1
-
         if (flag_num + 1) < len(command):
             folder = self.pathexist(command[-1].split("/"))
             if folder == False:
@@ -298,7 +293,6 @@ class Namespace():
                 return
         else:
             folder = self.pwd
-
         if ('-d' in command) or folder.type == 'file':
             if folder.parent == None:
                 if folder.perm('r',self.user) == False:
@@ -311,11 +305,9 @@ class Namespace():
             if folder.perm('r',self.user) == False:
                 print("ls: Permission denied")
                 return
-
         if check_ancestor_perm(folder,'x',self.user) == False:
             print("ls: Permission denied")
             return
-
         if folder.type == 'file':
             temp_file = [folder.file_permission, folder.owner, command[-1]]
             folders.append(temp_file)
@@ -352,7 +344,6 @@ class Namespace():
                 for c in folder.child:
                     temp_file = [c.file_permission, c.owner, c.name]
                     folders.append(temp_file)
-
         i = 0
         hidden_files = []
         while i < len(folders):
@@ -361,10 +352,8 @@ class Namespace():
                 folders.pop(i)
             else:
                 i += 1
-
         if '-a' in command:
             folders = hidden_files + folders
-
         if '-l' in command: 
             for child in folders:
                 print(child[0] + " " + child[1] + " " +child[2])
@@ -376,16 +365,13 @@ class Namespace():
         flag_r = False
         if '-r' in command:
             flag_r = True
-
         file = self.pathexist(command[-1].split("/"))
         if file == False:
             print('chmod: No such file or directory')
             return
-
         if check_ancestor_perm(file,'x',self.user) == False:
             print("chmod: Permission denied")
-            return
-            
+            return 
         if flag_r:
             all_files = []
             all_files.append(file)
@@ -468,11 +454,11 @@ class Namespace():
                 denied = True
         return denied
 
+
 def change_mode(file_permission, mode):
     cur_perm = []
     for perm in file_permission:
         cur_perm.append(perm)
-
     user = []
     sign = None
     perm = []
@@ -483,7 +469,6 @@ def change_mode(file_permission, mode):
         "w" : 1,
         "x" : 2,
     }
-
     i = 0
     while i < len(mode):
         if mode[i] in ["u","o","a"]:
@@ -509,7 +494,6 @@ def change_mode(file_permission, mode):
             i += 1
         else:
             return False
-
     for u in user:
         if sign == "=":
             i = 0
@@ -522,11 +506,11 @@ def change_mode(file_permission, mode):
                 cur_perm[ind] = "-"
             else:
                 cur_perm[ind] = p
-
     result = ''
     for p in cur_perm:
         result += p
     return result
+
 
 def check_ancestor_perm(file, ind, user):
     if file.perm(ind,user) == False:
@@ -535,6 +519,7 @@ def check_ancestor_perm(file, ind, user):
         return True
     else:
         return check_ancestor_perm(file.parent, ind, user)
+
 
 def input_command(user, pwd):
     '''
@@ -546,7 +531,6 @@ def input_command(user, pwd):
     temp = input(user+":"+ str(pwd) +"$ ")
     valid_list = { "-", "_", "\"", " ", "+",\
          "=", ".", "/", "\t", "\n", "\r", "\v"}
-
     i = 0
     start = 0
     command = []
@@ -577,6 +561,7 @@ def input_command(user, pwd):
         if c == '':
             command.remove(c)
     return command, valid
+
 
 def main():
     # creating a root user
