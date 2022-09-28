@@ -1,0 +1,6 @@
+adduser user
+deluser haha
+deluser user
+su user
+deluser root
+deluser

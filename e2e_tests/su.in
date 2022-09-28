@@ -1,0 +1,7 @@
+adduser user
+adduser user2
+su user
+su user2
+su
+su user3
+su root
