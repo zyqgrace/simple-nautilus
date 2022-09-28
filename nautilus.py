@@ -104,7 +104,6 @@ class Namespace():
         if self.pathexist(file) != False:
             return
         dir.add_file(filename,self.user)
-        
 
     def mkdir(self,command):
         dir = command[-1].split("/")
@@ -125,13 +124,12 @@ class Namespace():
                         break
                 else:
                     temp_dir = self.pathexist(dir[:i-1], 'directory')
-                    temp_dir.add_directory(dir[i-1],self.user)
+                    temp_dir.add_directory(dir[i-1], self.user)
                 i+=1
         else:
             if self.pathexist(dir) != False:
                 print("mkdir: File exists")
                 return
-            
             if len(dir)==1:
                 parent_dir = self.pwd
             else:
@@ -141,7 +139,7 @@ class Namespace():
                 True,'x',self.user):
                     print('mkdir: Permission denied')
                 else:
-                    parent_dir.add_directory(dir[-1],self.user)
+                    parent_dir.add_directory(dir[-1], self.user)
             else:
                 print("mkdir: Ancestor directory does not exist")
     
