@@ -1,0 +1,17 @@
+mkdir a/b
+mkdir -p a/b
+ls -l a
+mkdir a/b
+mkdir -p a/b
+ls -l a
+mkdir a/../a
+mkdir -p a/../a
+ls -l
+chmod o+w /
+chmod o-x /
+adduser user
+su user
+mkdir a/c
+su
+mkdir -p a/b/c/e/d
+ls a/b/c/d

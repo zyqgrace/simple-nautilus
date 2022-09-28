@@ -12,4 +12,4 @@ root:/$
 root:/$
 user:/$ 
 user:/$ 
-user:/$ drwxr-x root b  drwxr-x root c  drwxr-x user allow
+user:/$ drwxr-x root b drwxr-x root c drwxr-x user allow

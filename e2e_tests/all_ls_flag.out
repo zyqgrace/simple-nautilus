@@ -1,14 +1,18 @@
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ 
 root:/$ a  b  c  d
 root:/$ e  f
 root:/$ c
-root:/$ drwxr-x root a  drwxr-x root b  -rw-r-- root c  -rw-r-- root d
+root:/$ drwxr-x root a drwxr-x root b -rw-r-- root c -rw-r-- root d
 root:/$ .  ..  .hidden  a  b  c  d
 root:/$
-root:/$ drwxr-x root .   drwxr-x root ..   -rw-r-- root .hidden
-drwxr-x root a   drwxr-x root b   -rw-r-- root c   -rw-r-- root d
+root:/$ drwxr-x root .  drwxr-x root ..  -rw-r-- root .hidden
+drwxr-x root a  drwxr-x root b  -rw-r-- root c  -rw-r-- root d
 root:/$ a/e
 root:/$ a
-root:/$ drwxr-x root .  drwxr-x root ..  -rw-r-- root e  -rw-r-- root f
+root:/$ drwxr-x root . drwxr-x root .. -rw-r-- root e -rw-r-- root f
 root:/$ a
 root:/$ drwxr-x root a
 root:/$ drwxr-x root .

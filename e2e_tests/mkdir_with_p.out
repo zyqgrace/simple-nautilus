@@ -1,0 +1,16 @@
+root:/$ mkdir: Ancestor directory does not exist
+root:/$ 
+root:/$ drwxr-x root b
+root:/$ mkdir: File exists
+root:/$ 
+root:/$ drwxr-x root b
+root:/$ mkdir: File exists
+root:/$ 
+root:/$ drwxr-x root a
+root:/$ 
+root:/$ 
+root:/$ 
+user:/$ 
+user:/$ mkdir: Permission denied
+root:/$ 
+root:/$ e
