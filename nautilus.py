@@ -196,7 +196,7 @@ class Namespace():
             print('cp: Permission denied')
             return
 
-        dis_dir.add_file(path2[-1])
+        dis_dir.add_file(path2[-1],self.user)
 
     def mv(self,command):
         path = command[1].split("/")
