@@ -7,6 +7,13 @@ mv a/b/c/d /x/y/z/h
 su
 chmod o+w a/b/c
 chmod o+w /x/y/z
+chmod o+x a/b/c/d
 su user
 mv a/b/c/d /x/y/z/h
-ls -l
+ls -l /x/y/z
+su
+rm /x/y/z/h
+touch a/b/c/d
+ls -l a/b/c
+mv a/b/c/d x/y/z/h
+ls -l x/y/z

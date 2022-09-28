@@ -4,3 +4,16 @@ root:/$
 root:/$
 user:/$
 user:/$ mv: Permission denied
+root:/$
+root:/$
+root:/$
+root:/$
+user:/$
+user:/$
+user:/$ -rw-r-x root h
+root:/$
+root:/$
+root:/$
+root:/$ -rw-r-- root d
+root:/$ 
+root:/$ -rw-r-- root h

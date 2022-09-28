@@ -1,0 +1,21 @@
+mkdir a
+touch a/b
+rm a/b
+ls
+rm a/c
+rm a
+mkdir -p a/b/c 
+touch a/b/c/d
+ls a/b/c
+rm a/b/c/d
+ls a/b/c
+touch hello
+rm ./hello
+ls -l
+touch a/b/c/d
+chmod o+w a/b/c
+chmod o+wx a/b/c/d
+adduser user
+su user
+rm a/b/c/d
+ls -l a/b/c
