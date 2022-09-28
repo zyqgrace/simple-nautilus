@@ -1,0 +1,16 @@
+mkdir folder
+touch file
+ls -l
+chmod a+rxw folder
+chmod a-rxw file
+ls -l
+chmod u-x folder
+chmod u=rw file
+ls -l
+chmod o+r not_exist
+touch folder/a
+touch folder/b
+touch folder/c
+ls -l folder
+chmod -r o+x folder
+ls -l folder

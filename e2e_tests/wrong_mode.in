@@ -1,0 +1,12 @@
+touch file
+chmod oo-- file
+chmod
+chmod file
+chmod o-+x file
+chmod x-o file
+chmod aaa file
+chmod a file
+chmod =x file
+ls -l file
+chmod ou= file
+ls -l 

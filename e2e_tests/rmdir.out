@@ -1,0 +1,19 @@
+root:/$
+root:/$
+root:/folder/a/b$
+root:/folder/a/b$
+root:/folder/a/b$
+root:/$
+root:/$
+root:/$ rmdir: Not a directory
+root:/$ rmdir: No such file or directory
+root:/$ rmdir: Cannot remove pwd
+root:/$ rmdir: Directory not empty
+root:/$ 
+user:/$ 
+user:/$ rmdir: Permission denied
+root:/$ 
+root:/$ 
+user:/$ 
+user:/$
+user:/$

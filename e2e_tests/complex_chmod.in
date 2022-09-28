@@ -1,0 +1,13 @@
+adduser user1
+adduser user2
+chmod o+w /
+su user1
+mkdir folder
+ls -l
+chmod o=w folder
+ls -l
+su user2
+chmod a-w folder
+su
+chmod u-x folder
+su user1

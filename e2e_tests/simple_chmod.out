@@ -1,0 +1,16 @@
+root:/$ 
+root:/$ 
+root:/$ drwxr-x root folder -rw-r-- root file
+root:/$ 
+root:/$ 
+root:/$ drwxrwx root folder ------- root file
+root:/$ 
+root:/$ 
+root:/$ drw-rwx root folder -rw---- root file
+root:/$ chmod: No such file or directory
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ -rw-r-- root a -rw-r-- root b -rw-r-- root c
+root:/$ 
+root:/$ -rw-r-x root a -rw-r-x root b -rw-r-x root c

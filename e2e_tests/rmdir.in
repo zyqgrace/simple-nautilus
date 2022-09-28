@@ -1,0 +1,19 @@
+mkdir folder
+mkdir -p folder/a/b/c
+cd folder/a/b
+rmdir c
+ls -l .
+cd /
+touch file
+rmdir file
+rmdir folder/a/b/c
+rmdir /
+rmdir folder
+adduser user
+su user
+rmdir folder/a/b
+su
+chmod o+w folder/a
+su user
+rmdir folder/a/b
+ls -l folder/a 

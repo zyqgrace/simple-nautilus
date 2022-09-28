@@ -1,0 +1,14 @@
+root:/$ 
+root:/$ 
+root:/$ 
+user1:/$
+user1:/$
+user1:/$ drwxr-x user1 folder
+user1:/$
+user1:/$ drwx-w- user1 folder
+user2:/$
+user2:/$ chmod: Permission denied
+root:/$ 
+root:/$ 
+user1:/$
+user1:/$ chmod: Permission denied

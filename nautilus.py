@@ -367,7 +367,10 @@ class Namespace():
             flag_r = True
 
         file = self.pathexist(command[-1].split("/"))
-
+        if file == False:
+            print('chmod: No such file or directory')
+            return
+            
         if check_ancestor_perm(file,'x',self.user) == False:
             print("chmod: Permission denied")
             return
@@ -484,9 +487,11 @@ def change_mode(file_permission, mode):
                 break
             else:
                 return False
-    sign = mode[i]
+    if i < len(mode):
+        sign = mode[i]
+    else:
+        return False
     i += 1
-
     while i < len(mode):
         if mode[i] in ["r","x","w"]:
             perm.append(mode[i])
