@@ -142,8 +142,7 @@ class Namespace():
             if  parent_dir != False:
                 if parent_dir.perm_check(True,'w',False,'',True,'x',self.user):
                     print('mkdir: Permission denied')
-                else:
-                    parent_dir.add_directory(dir[-1])
+                parent_dir.add_directory(dir[-1])
             else:
                 print("mkdir: Ancestor directory does not exist")
     
@@ -582,9 +581,9 @@ def main():
             continue
         elif command == []:
             continue
-        elif command[0] == "su" and len(command)==2:
+        elif command[0] == "su":
             cur_user.su(command,users)
-        elif command[0] == "adduser" and len(command)==2:
+        elif command[0] == "adduser":
             users = cur_user.adduser(command,users)
         elif command[0] == "deluser":
             unwant_user = command[1]
@@ -634,4 +633,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+        
         
