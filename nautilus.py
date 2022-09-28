@@ -63,7 +63,7 @@ class Namespace():
                     if file.type in type:
                         if path[i] == file.name:
                             cur = file
-                            i +=1
+                            i += 1
                             found = True
                             break
                 if not found:
@@ -326,17 +326,32 @@ class Namespace():
         else:
             if '-d' in command:
                 if flag_num + 1 < len(command):
-                    temp_file = [folder.file_permission, folder.owner, command[-1]]
+                    temp_file = [
+                        folder.file_permission,
+                        folder.owner, command[-1]
+                        ]
                 else:
-                    temp_file = [folder.file_permission, folder.owner, '.']
+                    temp_file = [
+                        folder.file_permission,
+                        folder.owner, '.'
+                        ]
                 folders.append(temp_file)
             else:
-                temp_file = [folder.file_permission, folder.owner, "."]
+                temp_file = [
+                    folder.file_permission,
+                    folder.owner, "."
+                    ]
                 folders.append(temp_file)
                 if folder.parent == None:
-                    temp_file = [folder.file_permission, folder.owner, ".."]
+                    temp_file = [
+                        folder.file_permission,
+                        folder.owner, ".."
+                        ]
                 else:
-                    temp_file = [folder.parent.file_permission, folder.parent.owner, ".."]
+                    temp_file = [
+                        folder.parent.file_permission,
+                        folder.parent.owner, ".."
+                        ]
                 folders.append(temp_file)
                 for c in folder.child:
                     temp_file = [c.file_permission, c.owner, c.name]
@@ -597,7 +612,8 @@ def main():
                 print("deluser: The user does not exist")
             elif unwant_user == "root":
                 print("WARNING: You are just about to delete the root account")
-                print("Usually this is never required as it may render the whole system unusable")
+                print("Usually this is never required as it\
+                    may render the whole system unusable")
                 print("If you really want this, call deluser with parameter --force")
                 print("(but this `deluser` does not allow `--force`, haha)")
                 print("Stopping now without having performed any action")
