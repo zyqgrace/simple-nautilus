@@ -6,6 +6,10 @@ mkdir a
 mkdir /c/p
 ls -l a
 adduser user
-us user
+su user
 mkdir /a/not_allow
-chmod o+x no_x
+su
+chmod o+w a
+su user
+mkdir /a/allow
+ls -l a

@@ -6,5 +6,10 @@ root:/$ mkdir: File exists
 root:/$ mkdir: Ancestor directory does not exist
 root:/$ drwxr-x root b  drwxr-x root c
 root:/$ 
-root:/$ 
-root:/$ mkdir: Permission denied
+user:/$ 
+user:/$ mkdir: Permission denied
+root:/$
+root:/$
+user:/$ 
+user:/$ 
+user:/$ drwxr-x root b  drwxr-x root c  drwxr-x user allow

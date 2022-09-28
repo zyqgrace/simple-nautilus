@@ -70,13 +70,11 @@ class Namespace():
                     return False
         return cur
     
-    def add_directory(self, filename):
-        owner = self.user
+    def add_directory(self, filename, owner):
         dir = Namespace(filename, self,self.user,owner)
         self.child.append(dir)
 
-    def add_file(self, filename):
-        owner = self.user
+    def add_file(self, filename, owner):
         file = Namespace(filename, self, self.user,owner)
         file.type = "file"
         file.file_permission = "-rw-r--"
@@ -101,7 +99,7 @@ class Namespace():
 
         if self.pathexist(file) != False:
             return
-        dir.add_file(filename)
+        dir.add_file(filename,self.user)
         
 
     def mkdir(self,command):
@@ -113,7 +111,7 @@ class Namespace():
         if command[1] == '-p':
             first_dir = self.pathexist(dir[0],'directory')
             if first_dir == False:
-                self.pwd.add_directory(dir[0])
+                self.pwd.add_directory(dir[0],self.user)
 
             i = 1
             while i <= len(dir):
@@ -128,7 +126,7 @@ class Namespace():
                         break
                 else:
                     temp_dir = self.pathexist(dir[:i-1],'directory')
-                    temp_dir.add_directory(dir[i-1])
+                    temp_dir.add_directory(dir[i-1],self.user)
                 i+=1
         else:
             if self.pathexist(dir) != False:
@@ -143,7 +141,7 @@ class Namespace():
                 if parent_dir.perm_check(True,'w',False,'',True,'x',self.user):
                     print('mkdir: Permission denied')
                 else:
-                    parent_dir.add_directory(dir[-1])
+                    parent_dir.add_directory(dir[-1],self.user)
             else:
                 print("mkdir: Ancestor directory does not exist")
     
