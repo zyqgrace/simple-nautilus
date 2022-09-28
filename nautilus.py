@@ -36,39 +36,6 @@ class Namespace():
         else:
             users.append(command[1])
         return users
-
-    # if path exist return the path, else return False
-    def pathexist(self, path, type=['directory', 'file']):
-        if path == ["", ""]:
-            return self
-        cur = self
-        if path[0] == "":
-            path = path[1:]
-        else:
-            cur = self.pwd
-        i = 0
-        while i < len(path):
-            if path[i] == ".":
-                i+=1
-            elif path[i] == "..":
-                if cur.parent == None:
-                    pass
-                else:
-                    cur = cur.parent
-                i+=1
-            else:
-                if len(cur.child) == 0:
-                    return False
-                found = False
-                for file in cur.child:
-                    if file.type in type and path[i] == file.name:
-                        cur = file
-                        i += 1
-                        found = True
-                        break
-                if not found:
-                    return False
-        return cur
     
     def add_directory(self, filename, owner):
         dir = Namespace(
@@ -155,12 +122,12 @@ class Namespace():
         else:
             self.pwd = temp
 
-    def cp(self,command):
+    def cp(self, command):
         path = command[1].split("/")
         path2 = command[2].split("/")
         source = self.pathexist(path)
         copy_file = self.pathexist(path2)
-        if len(path2)==1:
+        if len(path2) == 1:
             dis_dir = self.pwd
         else:
             dis_dir = self.pathexist(path2[:-1])
@@ -174,10 +141,7 @@ class Namespace():
         if source == False:
             print("cp: No such file")
             return
-        if dis_dir == False:
-            print("cp: No such file or directory")
-            return
-        if dis_dir.type == 'file':
+        if dis_dir == False or dis_dir.type == 'file':
             print("cp: No such file or directory")
             return
         if source.type == 'directory':
@@ -395,6 +359,39 @@ class Namespace():
                 file.file_permission = change_mode(
                     file.file_permission, command[-2]
                     )
+
+    # if path exist return the path, else return False
+    def pathexist(self, path, type=['directory', 'file']):
+        if path == ["", ""]:
+            return self
+        cur = self
+        if path[0] == "":
+            path = path[1:]
+        else:
+            cur = self.pwd
+        i = 0
+        while i < len(path):
+            if path[i] == ".":
+                i+=1
+            elif path[i] == "..":
+                if cur.parent == None:
+                    pass
+                else:
+                    cur = cur.parent
+                i+=1
+            else:
+                if len(cur.child) == 0:
+                    return False
+                found = False
+                for file in cur.child:
+                    if file.type in type and path[i] == file.name:
+                        cur = file
+                        i += 1
+                        found = True
+                        break
+                if not found:
+                    return False
+        return cur
 
     def recursive(self):
         result = []
