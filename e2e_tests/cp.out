@@ -1,0 +1,17 @@
+root:/$
+root:/$
+root:/$
+root:/$
+root:/$ cp: File exists
+root:/$ k
+root:/$
+user:/$
+user:/$
+user:/$ cp: Permission denied
+user:/$ cp: Destination is a directory
+user:/$ cp: Destination is a directory
+user:/$ cp: Source is a directory
+user:/$ cp: No such file
+user:/$ cp: File exists
+user:/$ No such file or directory
+root:/$ bye, root

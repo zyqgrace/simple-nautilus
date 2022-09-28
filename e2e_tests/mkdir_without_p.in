@@ -1,0 +1,11 @@
+mkdir a
+mkdir a/b
+mkdir /a/c
+ls a
+mkdir a
+mkdir /c/p
+ls -l a
+adduser user
+us user
+mkdir /a/not_allow
+chmod o+x no_x

@@ -1,0 +1,23 @@
+mkdir a
+mkdir b
+touch .hidden
+touch c
+touch d
+touch /a/e
+touch /a/f
+ls
+ls a
+ls c
+ls -l
+ls -a
+ls -d
+ls -l -a
+ls -d a/e
+ls -d a
+ls -l -a a
+ls -a -d a
+ls -l -d a
+ls -l -a -d
+ls -l -a -d a
+ls -l -a -d c
+

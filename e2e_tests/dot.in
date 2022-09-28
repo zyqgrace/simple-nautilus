@@ -1,0 +1,15 @@
+mkdir a
+mkdir a/d
+mkdir a/d/e
+mkdir a/d/e/f
+mkdir b
+touch c
+cd ..
+cd ../a
+cd .
+cd ././././d
+cd ../d/./e
+cd ../../..
+cd a/../b/./.././c
+cd ./a/./d/./e/./f
+

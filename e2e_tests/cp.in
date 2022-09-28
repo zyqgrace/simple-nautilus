@@ -1,0 +1,17 @@
+mkdir a
+mkdir b
+touch /a/p
+cp /a/p /b/k
+cp ../a/p ../b/k
+ls b
+adduser user
+chmod o-r /a/p
+su user
+cp /a/p /b/l
+cp /a/p /b
+cp /a /b
+cp /a /b/l
+cp /c/p /b/l
+cp /a/p /a/p
+cp /a/b /c/d
+exit

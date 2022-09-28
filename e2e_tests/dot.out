@@ -1,0 +1,9 @@
+root:/$
+root:/a$
+root:/a$
+root:/a$
+root:/a/d$
+root:/a/d/e$
+root:/$
+root:/$ cd: Destination is a file
+root:/a/d/e/f$
