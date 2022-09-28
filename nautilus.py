@@ -385,19 +385,22 @@ class Namespace():
                     if change_mode(c.file_permission, command[-2]) == False:
                         print('chmod: Invalid mode')
                     else:
-                        c.file_permission = change_mode(c.file_permission, command[-2])
+                        c.file_permission = change_mode(
+                            c.file_permission, command[-2]
+                            )
         else:
             if change_mode(file.file_permission, command[-2]) == False:
                 print('chmod: Invalid mode')
             else:
-                file.file_permission = change_mode(file.file_permission, command[-2])
+                file.file_permission = change_mode(
+                    file.file_permission, command[-2]
+                    )
 
     def recursive(self):
         result = []
         if len(self.child) == 0:
             return []
         result += self.child
-
         for c in self.child:   
             result += c.recursive()
         return result
@@ -415,11 +418,9 @@ class Namespace():
             if file == False:
                 print("chown: No such file or directory")
                 return 
-
             files.append(file)
             if '-r' in command:
                     files += file.recursive()
-
             for f in files:
                     f.owner = new_owner
 
@@ -558,7 +559,6 @@ def input_command(user, pwd):
         i += 1
     if start < len(temp):
         command.append(temp[start:])
-
     for c in command:
         if c == '':
             command.remove(c)
