@@ -1,0 +1,5 @@
+root:/$ 
+root:/$ adduser: The user already exists
+user:/$ 
+user:/$ adduser: Operation not permitted
+root:/$

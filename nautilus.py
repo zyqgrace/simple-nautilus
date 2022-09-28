@@ -370,7 +370,7 @@ class Namespace():
         if file == False:
             print('chmod: No such file or directory')
             return
-            
+
         if check_ancestor_perm(file,'x',self.user) == False:
             print("chmod: Permission denied")
             return
@@ -625,7 +625,7 @@ def main():
             cur_user.ls(command)
         elif command[0] == "chmod" and 2 <= len(command) <= 4:
             cur_user.chmod(command)
-        elif command[0]=="chown":
+        elif command[0]=="chown" and 2 <= len(command) <= 4:
             cur_user.chown(command,users)
         else:
             if command[0] in all_commands:

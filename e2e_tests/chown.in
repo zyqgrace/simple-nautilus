@@ -1,0 +1,16 @@
+adduser user
+adduser nancy
+chmod o+w /
+su user
+mkdir -p a/b/c
+touch a/b/c/d
+ls -l 
+su
+chown
+chown nancy a
+ls -l
+chown none a
+chown user b
+su user
+chown user a
+

@@ -1,0 +1,15 @@
+root:/$ 
+root:/$ 
+root:/$
+user:/$ 
+user:/$ 
+user:/$ 
+user:/$ drwxr-x user a
+root:/$
+root:/$ chown: Invalid syntax
+root:/$
+root:/$ drwxr-x nancy a
+root:/$ chown: Invalid user
+root:/$ chown: No such file or directory
+user:/$
+user:/$ chown: Operation not permitted

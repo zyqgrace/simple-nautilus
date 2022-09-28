@@ -1,0 +1,6 @@
+adduser user
+adduser user
+su user
+adduser user2
+su
+
