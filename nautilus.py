@@ -168,7 +168,7 @@ class Namespace():
         elif source == False:
             print("mv: No such file")
             return
-        elif (dis !=False and dis.type == "directory"):
+        elif (dis != False and dis.type == "directory"):
             print("mv: Destination is a directory")
             return
         elif source.type == "directory":
@@ -236,12 +236,9 @@ class Namespace():
                     if dir.name == c.name and c.type == "directory":
                         self.child.remove(c)
             else:
-                i = 0
-                while i < len(parent.child):
-                    if dir.name == parent.child[i].name \
-                        and parent.child[i].type == "directory":
-                        parent.child.pop(i)
-                    i += 1
+                for c in parent.child:
+                    if dir.name == c.name and c.type == "directory":
+                        parent.child.remove(c)
 
     def ls(self,command):
         folders = []
