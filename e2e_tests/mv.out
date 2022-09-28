@@ -1,0 +1,13 @@
+root:/$ 
+root:/$ 
+root:/$ 
+root:/$ . .. dst
+root:/$ 
+root:/$
+root:/$ -rw-r-- root dst
+root:/$ 
+root:/$ mv: File exists
+root:/$ mv: No such file
+root:/$ mv: Source is a directory
+root:/$ mv: Destination is a directory
+root:/$ mv: File exists

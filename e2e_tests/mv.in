@@ -1,0 +1,13 @@
+mkdir a
+touch /a/src
+mv /a/src /a/dst
+ls -a a
+mkdir b
+mv /a/dst /b/dst
+ls -l b
+touch a/new_src
+mv a/new_src b/dst
+mv a/not_exist b/not_exist
+mv ../a b/file
+mv a/new_src b
+mv a/new_src a/new_src

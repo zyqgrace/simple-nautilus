@@ -1,0 +1,18 @@
+mkdir no_r
+chmod o-r no_r
+touch no_r/file
+mkdir distination
+adduser user
+su user
+cp /no_r/file /distination/file1
+su
+mkdir -p first/no_x/last
+touch first/no_x/last/file
+chmod o-x first/no_x
+su user
+cp first/no_x/last/file distination/file
+su
+mkdir a
+touch a/b
+su user
+cp a/b first/no_x/last/file1
