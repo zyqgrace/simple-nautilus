@@ -142,7 +142,8 @@ class Namespace():
             if  parent_dir != False:
                 if parent_dir.perm_check(True,'w',False,'',True,'x',self.user):
                     print('mkdir: Permission denied')
-                parent_dir.add_directory(dir[-1])
+                else:
+                    parent_dir.add_directory(dir[-1])
             else:
                 print("mkdir: Ancestor directory does not exist")
     
@@ -583,9 +584,9 @@ def main():
             continue
         elif command[0] == "su":
             cur_user.su(command,users)
-        elif command[0] == "adduser":
+        elif command[0] == "adduser" and len(command) == 2:
             users = cur_user.adduser(command,users)
-        elif command[0] == "deluser":
+        elif command[0] == "deluser" and len(command) == 2:
             unwant_user = command[1]
             if cur_user.user != 'root':
                 print('deluser: Operation not permitted')
