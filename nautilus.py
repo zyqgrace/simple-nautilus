@@ -465,7 +465,7 @@ def change_mode(file_permission, mode):
     }
     i = 0
     while i < len(mode):
-        if mode[i] in ["u","o","a"]:
+        if mode[i] in ["u", "o", "a"]:
             if mode[i] == "a":
                 user.append("u")
                 user.append("o")
@@ -473,7 +473,7 @@ def change_mode(file_permission, mode):
                 user.append(mode[i])
             i += 1
         else:
-            if mode[i] in ["+","=","-"]:
+            if mode[i] in ["+", "=", "-"]:
                 break
             else:
                 return False
@@ -483,7 +483,7 @@ def change_mode(file_permission, mode):
         return False
     i += 1
     while i < len(mode):
-        if mode[i] in ["r","x","w"]:
+        if mode[i] in ["r", "x", "w"]:
             perm.append(mode[i])
             i += 1
         else:
