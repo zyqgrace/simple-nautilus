@@ -1,0 +1,12 @@
+mkdir -p a/b/c
+touch a/b/c/d
+mkdir -p x/y/z
+adduser user
+su user
+mv a/b/c/d /x/y/z/h
+su
+chmod o+w a/b/c
+chmod o+w /x/y/z
+su user
+mv a/b/c/d /x/y/z/h
+ls -l
