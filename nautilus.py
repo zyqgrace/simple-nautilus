@@ -37,6 +37,7 @@ class Namespace():
             users.append(command[1])
         return users
 
+    # if path exist return the path, else return False
     def pathexist(self, path, type=['directory', 'file']):
         if path == ["", ""]:
             return self
@@ -56,16 +57,15 @@ class Namespace():
                     cur = cur.parent
                 i+=1
             else:
-                if len(cur.child)==0:
+                if len(cur.child) == 0:
                     return False
                 found = False
                 for file in cur.child:
-                    if file.type in type:
-                        if path[i] == file.name:
-                            cur = file
-                            i += 1
-                            found = True
-                            break
+                    if file.type in type and path[i] == file.name:
+                        cur = file
+                        i += 1
+                        found = True
+                        break
                 if not found:
                     return False
         return cur
@@ -612,8 +612,7 @@ def main():
                 print("deluser: The user does not exist")
             elif unwant_user == "root":
                 print("WARNING: You are just about to delete the root account")
-                print("Usually this is never required as it\
-                    may render the whole system unusable")
+                print("Usually this is never required as it may render the whole system unusable")
                 print("If you really want this, call deluser with parameter --force")
                 print("(but this `deluser` does not allow `--force`, haha)")
                 print("Stopping now without having performed any action")
