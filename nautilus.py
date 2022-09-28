@@ -138,7 +138,8 @@ class Namespace():
             else:
                 parent_dir = self.pathexist(dir[:-1])
             if  parent_dir != False:
-                if parent_dir.perm_check(True,'w',False,'',True,'x',self.user):
+                if parent_dir.perm_check(True,'w',False,'',
+                True,'x',self.user):
                     print('mkdir: Permission denied')
                 else:
                     parent_dir.add_directory(dir[-1],self.user)
