@@ -232,13 +232,10 @@ class Namespace():
                 return
             parent = dir.parent
             if parent == None:
-                for c in self.child:
-                    if dir.name == c.name and c.type == "directory":
-                        self.child.remove(c)
-            else:
-                for c in parent.child:
-                    if dir.name == c.name and c.type == "directory":
-                        parent.child.remove(c)
+                parent = self
+            for c in parent.child:
+                if dir.name == c.name and c.type == "directory":
+                    parent.child.remove(c)
 
     def ls(self,command):
         folders = []
