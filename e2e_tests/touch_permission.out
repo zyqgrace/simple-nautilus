@@ -12,3 +12,12 @@ root:/$
 user:/$ 
 user:/$ 
 user:/$ -rw-r-- user f
+root:/$ 
+root:/$ 
+user:/$ 
+user:/$ touch: Permission denied
+root:/$ 
+root:/$ 
+root:/$ 
+user:/$ 
+user:/$ touch: Permission denied

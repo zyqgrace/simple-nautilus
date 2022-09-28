@@ -12,3 +12,12 @@ chmod o+w a/b/c/d/e
 su user
 touch a/b/c/d/e/f
 ls -l a/b/c/d/e
+su
+chmod o-x a/b/c
+su user
+touch a/b/c/d/e/no_x
+su
+chmod o+x a/b/c
+chmod o-w a/b/c/d/e
+su user
+touch a/b/c/d/e/no_w
