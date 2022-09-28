@@ -119,7 +119,8 @@ class Namespace():
             while i <= len(dir):
                 temp_dir = self.pathexist(dir[:i], 'directory')
                 if temp_dir != False:
-                    if not temp_dir.perm('w',self.user):
+                    if temp_dir.perm_check(True,'w', False, '',
+                    True, 'x', self.user):
                         print("mkdir: Permission denied")
                         break
                 else:
