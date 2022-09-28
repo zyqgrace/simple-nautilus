@@ -112,10 +112,7 @@ class Namespace():
             print("mkdir: Invalid syntax")
             return
         if command[1] == '-p':
-            first_dir = self.pathexist(dir[0], 'directory')
-            if first_dir == False:
-                self.pwd.add_directory(dir[0], self.user)
-            i = 1
+            i = 2
             while i <= len(dir):
                 temp_dir = self.pathexist(dir[:i], 'directory')
                 if temp_dir != False:
