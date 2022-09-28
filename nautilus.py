@@ -112,14 +112,13 @@ class Namespace():
             print("mkdir: Invalid syntax")
             return
         if command[1] == '-p':
-            i = 2
+            first_dir = self.pathexist(dir[0], 'directory')
+            if first_dir == False:
+                self.pwd.add_directory(dir[0], self.user)
+            i = 1
             while i <= len(dir):
                 temp_dir = self.pathexist(dir[:i], 'directory')
                 if temp_dir != False:
-                    if i == len(dir) - 1:
-                        if not temp_dir.perm('r',self.user):
-                            print("mkdir: Permission denied")
-                            break
                     if not temp_dir.perm('w',self.user):
                         print("mkdir: Permission denied")
                         break
